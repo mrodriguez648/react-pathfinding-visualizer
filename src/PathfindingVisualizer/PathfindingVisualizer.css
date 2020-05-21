@@ -1,3 +1,9 @@
 .grid {
-  margin: 100px 0 0;
+  margin: 50px;
+}
+
+.interface {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 25px;
 }

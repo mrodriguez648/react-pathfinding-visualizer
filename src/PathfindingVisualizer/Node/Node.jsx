@@ -3,6 +3,10 @@ import React, {Component} from 'react';
 import './Node.css';
 
 export default class Node extends Component {
+  shouldComponentUpdate(nextProps, nextState) {
+    return (this.props.isVisited !== nextProps.isVisited);
+  }
+
   render() {
     const {
       row,
@@ -10,30 +14,24 @@ export default class Node extends Component {
       isStart,
       isFinish,
       isVisited,
-      onMouseDown,
-      onMouseEnter,
-      onMouseUp,
+      isWall,
     } = this.props;
-    const extraClassName = isFinish
-      ? 'node-finish'
-      : isStart
-      ? 'node-start'
-      : isVisited
-      ? 'node-visited'
-      : '';
+		
+    const extraClassName = 
+    isFinish
+    ? 'node-finish'
+    : isStart
+    ? 'node-start'
+    : isVisited
+    ? 'node-visited'
+    : isWall
+    ? 'node-wall'
+    : '';
 
     return (
       <div
         id={`node-${row}-${col}`}
-        className={`node ${extraClassName}`}
-        onMouseDown={(row, col) => onMouseDown(row, col)}
-        onMouseEnter={(row, col) => onMouseEnter(row, col)}
-        onMouseUp={() => onMouseUp()}  ></div>
+        className={`node ${extraClassName}`}></div>
     );
   }
 }
-
-export const DEFAULT_NODE = {
-  row: 0,
-  col: 0
-};

@@ -3,7 +3,7 @@ import './App.css';
 import PathfindingVisualizer from './PathfindingVisualizer/PathfindingVisualizer'
 
 function App() {
-  return (
+  return (  
     <div className="App">
       <PathfindingVisualizer></PathfindingVisualizer>
     </div>
