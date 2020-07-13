@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Node from './Node/Node';
 import { dijkstra } from '../algorithms/dijkstra';
 import { Button } from "@material-ui/core";
+import { AddBoxIcon } from '@material-ui/icons';
 
 import './PathfindingVisualizer.css';
 
@@ -10,12 +11,12 @@ TO-DO:
   INTEGRATE LOGIC FOR DEALING WITH WALL NODES
 */
 
-const ROW_COUNT = 20;
-const COL_COUNT = 50;
-const START_NODE_ROW = 10;
-const START_NODE_COL = 15;
-const FINISH_NODE_ROW = 8;
-const FINISH_NODE_COL = 25;
+const ROW_COUNT = 15;
+const COL_COUNT = 20;
+const START_NODE_ROW = 0;
+const START_NODE_COL = 0;
+const FINISH_NODE_ROW = 6;
+const FINISH_NODE_COL = 10;
 let ANIMATION_TIMEOUTS = [];
 
 export default class PathfindingVisualizer extends Component {
@@ -23,27 +24,76 @@ export default class PathfindingVisualizer extends Component {
     super(props);
     this.state = {
       grid: this.initGrid(),
+      isShiftKeyPressed: false,
+      isCtrlKeyPressed: false,
       isVisualizing: false
     };
   }
 
   updateWallNode = (row, col, isWallProp) => {
+    console.log("updateWallNode called", row, col, isWallProp);
     const newGrid = this.state.grid;
     const oldNode = newGrid[row][col];
     const updatedNode = React.cloneElement(
       oldNode,
-      {isWall: !isWallProp}
+      {isWall: isWallProp}
     )
     newGrid[row][col] = updatedNode;
     this.setState({ grid: newGrid });
   }
 
-  handleOnMouseEnter = () => {
-    console.log("mouseEnter");
-    // if (this.props.isStart || this.props.isFinish) return null;
-    // this.props.updateWallNode(this.props.row, this.props.col, this.props.isWall);
+  handleOnKeyDown = (e) => {
+    console.log("onKeyDown fired", e);
+    switch(e.keyCode) {
+      case 16:
+        if(!this.state.isCtrlKeyPressed) {
+          console.log("shift key case");
+          this.setState({ isShiftKeyPressed: !this.state.isShiftKeyPressed });
+        }
+        break;
+      case 17:
+        if(!this.state.isShiftKeyPressed) {
+          console.log("ctrl key case");
+          this.setState({ isCtrlKeyPressed: !this.state.isCtrlKeyPressed });
+        }
+        break;
+      default:
+    }
   }
-  
+
+  handleOnKeyUp = (e) => {
+    console.log("onKeyUp fired", e);
+    switch(e.keyCode) {
+      case 16:
+        if(!this.state.isCtrlKeyPressed) {
+          console.log("shift key case");
+          this.setState({ isShiftKeyPressed: !this.state.isShiftKeyPressed });
+        }
+        break;
+      case 17:
+        if(!this.state.isShiftKeyPressed) {
+          console.log("ctrl key case");
+          this.setState({ isCtrlKeyPressed: !this.state.isCtrlKeyPressed });
+        }
+        break;
+      default:
+    }
+  }
+
+  // handleOnMouseDown = () => {
+  //   this.setState({ mouseIsPressed: !this.state.mouseIsPressed });
+  // }
+
+  handleOnMouseEnter = (row, col, isWallState) => {
+    console.log("grid handleOnMouseEnter called");
+    if (this.state.isShiftKeyPressed && !isWallState) {
+      this.updateWallNode(row, col, !isWallState);
+    }
+    if (this.state.isCtrlKeyPressed && isWallState) {
+      this.updateWallNode(row, col, !isWallState);
+    }
+  }
+
   initGrid = () => {
     const grid = [];
     let nodeCount = 0;
@@ -53,6 +103,7 @@ export default class PathfindingVisualizer extends Component {
         const node = 
         <Node
           key={nodeCount}
+          nodeNum={nodeCount}
           row={row}
           col={col}
           isStart={row === START_NODE_ROW && col === START_NODE_COL}
@@ -60,8 +111,10 @@ export default class PathfindingVisualizer extends Component {
           isGraphNode={false}
           isShortestPathNode={false}
           isWall={false}
-          updateWallNode={this.updateWallNode} 
-          onMouseOver={this.handleOnMouseEnter}>
+          updateWallNode={this.updateWallNode}
+          onKeyDown={this.handleOnKeyDown}
+          onKeyUp={this.handleOnKeyUp}
+          onMouseEnter={this.handleOnMouseEnter}>
         </Node>
         currentRow.push(node);
         nodeCount += 1;
@@ -72,7 +125,6 @@ export default class PathfindingVisualizer extends Component {
   };
 
   resetGrid = () => {
-    console.log("resetGrid");
     // clear in progress and queued animations
     for (let i = 0; i < ANIMATION_TIMEOUTS.length; i++) {
       clearTimeout(ANIMATION_TIMEOUTS[i]);
@@ -110,7 +162,7 @@ export default class PathfindingVisualizer extends Component {
       }, 15 * t));
     }
 
-    // animate shortest path
+    // animate shortest path obtained through backwards propegation
     for (let i = 0; i < shortestPathGraphNodes.length; i++, t++) {
       timeouts.push(setTimeout(() => {
         const node = shortestPathGraphNodes[i];
@@ -126,7 +178,7 @@ export default class PathfindingVisualizer extends Component {
     return timeouts;
   }
 
-  testFunct = () => {
+  testButtonFunct = () => {
     const baseNode = this.state.grid[0][0]
     console.log("test funct node", baseNode);
     const newNode = React.cloneElement(
@@ -137,6 +189,7 @@ export default class PathfindingVisualizer extends Component {
   }
 
   render() {
+    console.log("grid render called, shiftPressed?, ctrlPressed?", this.state.isShiftKeyPressed, this.state.isCtrlKeyPressed);
     const grid = this.state.grid;
     return (
       <>
@@ -149,7 +202,7 @@ export default class PathfindingVisualizer extends Component {
         <Button onClick={() => this.resetGrid()}>
           Reset Grid
         </Button>
-        <Button onClick={() => this.testFunct()}>
+        <Button onClick={() => this.testButtonFunct()}>
           Test
         </Button>
       </div>

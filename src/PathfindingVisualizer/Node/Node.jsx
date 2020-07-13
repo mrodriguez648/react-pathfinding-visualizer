@@ -4,7 +4,7 @@ import './Node.css';
 
 export default class Node extends Component {
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps) {
     return (
       (this.props.isGraphNode !== nextProps.isGraphNode) ||
       (this.props.isShortestPathNode !== nextProps.isShortestPathNode) ||
@@ -13,7 +13,9 @@ export default class Node extends Component {
   }
 
   render() {
+    console.log("node render called");
     const {
+      nodeNum,
       row,
       col,
       isStart,
@@ -21,7 +23,8 @@ export default class Node extends Component {
       isGraphNode,
       isShortestPathNode,
       isWall,
-      onMouseEnter: onMouseOver
+      onKeyDown,
+      onKeyUp
     } = this.props;
 
     const stylingClassName = 
@@ -41,37 +44,35 @@ export default class Node extends Component {
       <div
         id={`node-${row}-${col}`}
         className={`node ${stylingClassName}`}
-        onMouseDown={this.handleOnMouseDown}
-        onMouseOver={onMouseOver}>
+        onKeyDown={(e) => onKeyDown(e)}
+        onKeyUp={(e) => onKeyUp(e)}
+        onMouseEnter={(e) => this.handleOnMouseEnter(e)}
+        onClick={this.handleOnClick}
+        onDrag={(e) => this.handleOnDrag(e)}
+        tabIndex={nodeNum}>
       </div>
     );
   }
 
-  /*
-  HANDLE MOUSE EVENTS FOR CLICK AND DRAG WALL CREATION
-  */
-
-  // handleOnPointerEnter = () => {
-  //   console.log("pointerEnter");
-  // }
-
-  handleOnMouseDown = () => {
-    console.log("mouseDown");
-    if (this.props.isStart || this.props.isFinish) return null;
-    this.props.updateWallNode(this.props.row, this.props.col, this.props.isWall);
+  handleOnDrag(e) {
+    e.stopPropagation();
+    e.preventDefault();
   }
 
-  // handleOnMouseEnter = () => {
-  //   console.log("mouseEnter");
-  //   // if (this.props.isStart || this.props.isFinish) return null;
-  //   // this.props.updateWallNode(this.props.row, this.props.col, this.props.isWall);
-  // }
+  handleOnClick = () => {
+    if (this.props.isStart || this.props.isFinish) return null;
+    this.props.updateWallNode(this.props.row, this.props.col, !this.props.isWall);
+  }
 
-  // handleMouseEnter(row, col) {
-  //   console.log("Mouse entered at", row, col);
-  // }
+  handleOnMouseEnter = (e) => {
+    e.stopPropagation();
+    if (this.props.isStart || this.props.isFinish) return null;
+    this.props.onMouseEnter(this.props.row, this.props.col, this.props.isWall);
+  }
 
-  // handleMouseUp() {
-  //   console.log("Mouse up");
+  // handleOnMouseOverCapture = () => {
+  //   console.log("mouseOverCaptured");
+  //   if (this.props.isStart || this.props.isFinish) return null;
+  //   this.props.updateWallNode(this.props.row, this.props.col, this.props.isWall);
   // }
 }
