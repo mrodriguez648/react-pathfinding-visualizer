@@ -22,9 +22,7 @@ export default class Node extends Component {
       isFinish,
       isGraphNode,
       isShortestPathNode,
-      isWall,
-      onKeyDown,
-      onKeyUp
+      isWall
     } = this.props;
 
     const stylingClassName = 
@@ -44,19 +42,11 @@ export default class Node extends Component {
       <div
         id={`node-${row}-${col}`}
         className={`node ${stylingClassName}`}
-        onKeyDown={(e) => onKeyDown(e)}
-        onKeyUp={(e) => onKeyUp(e)}
-        onMouseEnter={(e) => this.handleOnMouseEnter(e)}
+        onMouseEnter={this.handleOnMouseEnter}
         onClick={this.handleOnClick}
-        onDrag={(e) => this.handleOnDrag(e)}
         tabIndex={nodeNum}>
       </div>
     );
-  }
-
-  handleOnDrag(e) {
-    e.stopPropagation();
-    e.preventDefault();
   }
 
   handleOnClick = () => {
@@ -64,15 +54,9 @@ export default class Node extends Component {
     this.props.updateWallNode(this.props.row, this.props.col, !this.props.isWall);
   }
 
-  handleOnMouseEnter = (e) => {
-    e.stopPropagation();
+  handleOnMouseEnter = () => {
+    console.log("onMouseEnter fired");  
     if (this.props.isStart || this.props.isFinish) return null;
     this.props.onMouseEnter(this.props.row, this.props.col, this.props.isWall);
   }
-
-  // handleOnMouseOverCapture = () => {
-  //   console.log("mouseOverCaptured");
-  //   if (this.props.isStart || this.props.isFinish) return null;
-  //   this.props.updateWallNode(this.props.row, this.props.col, this.props.isWall);
-  // }
 }

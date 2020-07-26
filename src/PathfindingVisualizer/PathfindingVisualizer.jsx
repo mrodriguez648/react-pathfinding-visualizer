@@ -1,23 +1,42 @@
 import React, { Component } from 'react';
 import Node from './Node/Node';
+import SelectedMenu from './SelectedMenu';
 import { dijkstra } from '../algorithms/dijkstra';
-import { Button } from "@material-ui/core";
-import { AddBoxIcon } from '@material-ui/icons';
+import { Button, AppBar, Toolbar, Typography } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles'
 
 import './PathfindingVisualizer.css';
 
-/*
-TO-DO:
-  INTEGRATE LOGIC FOR DEALING WITH WALL NODES
-*/
-
-const ROW_COUNT = 15;
-const COL_COUNT = 20;
-const START_NODE_ROW = 0;
-const START_NODE_COL = 0;
-const FINISH_NODE_ROW = 6;
-const FINISH_NODE_COL = 10;
+const ROW_COUNT = 5;
+const COL_COUNT = 8;
+const START_NODE_ROW = Math.floor(Math.random() * ROW_COUNT);
+const START_NODE_COL = Math.floor(Math.random() * COL_COUNT);
+var FINISH_NODE_ROW = Math.floor(Math.random() * ROW_COUNT);
+while(FINISH_NODE_ROW === START_NODE_ROW) {
+  FINISH_NODE_ROW = Math.floor(Math.random() * ROW_COUNT);
+}
+var FINISH_NODE_COL = Math.floor(Math.random() * COL_COUNT);
+while(FINISH_NODE_COL === START_NODE_COL) {
+  FINISH_NODE_COL = Math.floor(Math.random() * COL_COUNT);
+}
 let ANIMATION_TIMEOUTS = [];
+
+const StyledButton = withStyles({
+  root: {
+    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+    borderRadius: 3,
+    border: 0,
+    color: 'white',
+    height: 48,
+    padding: '0 30px',
+    marginRight: 20,
+    marginLeft: 20,
+    boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
+  },
+  label: {
+    textTransform: 'capitalize',
+  },
+})(Button);
 
 export default class PathfindingVisualizer extends Component {
   constructor(props) {
@@ -26,12 +45,12 @@ export default class PathfindingVisualizer extends Component {
       grid: this.initGrid(),
       isShiftKeyPressed: false,
       isCtrlKeyPressed: false,
+      isMouseDown: false,
       isVisualizing: false
     };
   }
 
   updateWallNode = (row, col, isWallProp) => {
-    console.log("updateWallNode called", row, col, isWallProp);
     const newGrid = this.state.grid;
     const oldNode = newGrid[row][col];
     const updatedNode = React.cloneElement(
@@ -42,18 +61,28 @@ export default class PathfindingVisualizer extends Component {
     this.setState({ grid: newGrid });
   }
 
+  // Backtracks from the targetNode to find the shortest path.
+  // Only works when called after a graph alg
+  getNodesInShortestPathOrder = (targetGraphNode) => {
+    const nodesInShortestPathOrder = [];
+    let currentNode = targetGraphNode;
+    while (currentNode !== null) {
+      nodesInShortestPathOrder.unshift(currentNode);
+      currentNode = currentNode.previousNode;
+    }
+    return nodesInShortestPathOrder;
+  }
+
   handleOnKeyDown = (e) => {
-    console.log("onKeyDown fired", e);
+    console.log("onKeyDown fired");
     switch(e.keyCode) {
       case 16:
         if(!this.state.isCtrlKeyPressed) {
-          console.log("shift key case");
           this.setState({ isShiftKeyPressed: !this.state.isShiftKeyPressed });
         }
         break;
       case 17:
         if(!this.state.isShiftKeyPressed) {
-          console.log("ctrl key case");
           this.setState({ isCtrlKeyPressed: !this.state.isCtrlKeyPressed });
         }
         break;
@@ -62,17 +91,15 @@ export default class PathfindingVisualizer extends Component {
   }
 
   handleOnKeyUp = (e) => {
-    console.log("onKeyUp fired", e);
+    console.log("onKeyUp fired");
     switch(e.keyCode) {
       case 16:
         if(!this.state.isCtrlKeyPressed) {
-          console.log("shift key case");
           this.setState({ isShiftKeyPressed: !this.state.isShiftKeyPressed });
         }
         break;
       case 17:
         if(!this.state.isShiftKeyPressed) {
-          console.log("ctrl key case");
           this.setState({ isCtrlKeyPressed: !this.state.isCtrlKeyPressed });
         }
         break;
@@ -80,20 +107,18 @@ export default class PathfindingVisualizer extends Component {
     }
   }
 
-  // handleOnMouseDown = () => {
-  //   this.setState({ mouseIsPressed: !this.state.mouseIsPressed });
-  // }
+  handleOnMouseDown = () => {
+    console.log("mouseDown fired");
+    this.setState({ mouseIsPressed: !this.state.mouseIsPressed });
+  }
 
   handleOnMouseEnter = (row, col, isWallState) => {
-    console.log("grid handleOnMouseEnter called");
-    if (this.state.isShiftKeyPressed && !isWallState) {
-      this.updateWallNode(row, col, !isWallState);
-    }
-    if (this.state.isCtrlKeyPressed && isWallState) {
+    if 
+    ((this.state.isShiftKeyPressed && !isWallState) || (this.state.isCtrlKeyPressed && isWallState)) {
       this.updateWallNode(row, col, !isWallState);
     }
   }
-
+  
   initGrid = () => {
     const grid = [];
     let nodeCount = 0;
@@ -112,8 +137,8 @@ export default class PathfindingVisualizer extends Component {
           isShortestPathNode={false}
           isWall={false}
           updateWallNode={this.updateWallNode}
-          onKeyDown={this.handleOnKeyDown}
-          onKeyUp={this.handleOnKeyUp}
+          // onKeyDown={this.handleOnKeyDown}
+          // onKeyUp={this.handleOnKeyUp}
           onMouseEnter={this.handleOnMouseEnter}>
         </Node>
         currentRow.push(node);
@@ -141,7 +166,7 @@ export default class PathfindingVisualizer extends Component {
     const targetNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];   
     const visitedGraphNodesInOrder = dijkstra(grid, startNode, targetNode);
     const [targetGraphNode] = visitedGraphNodesInOrder.slice(-1);
-    const shortestPathGraphNodes = getNodesInShortestPathOrder(targetGraphNode);
+    const shortestPathGraphNodes = this.getNodesInShortestPathOrder(targetGraphNode);
     ANIMATION_TIMEOUTS = this.animateDijsktra(visitedGraphNodesInOrder, shortestPathGraphNodes);
   }
 
@@ -158,7 +183,7 @@ export default class PathfindingVisualizer extends Component {
           {isGraphNode: true}
         );
         newGrid[node.props.row][node.props.col] = newNode;
-        this.setState({ grid: newGrid }); 
+        this.setState({ grid: newGrid });
       }, 15 * t));
     }
 
@@ -179,7 +204,7 @@ export default class PathfindingVisualizer extends Component {
   }
 
   testButtonFunct = () => {
-    const baseNode = this.state.grid[0][0]
+    const baseNode = this.state.grid[0][0];
     console.log("test funct node", baseNode);
     const newNode = React.cloneElement(
       baseNode,
@@ -189,24 +214,31 @@ export default class PathfindingVisualizer extends Component {
   }
 
   render() {
-    console.log("grid render called, shiftPressed?, ctrlPressed?", this.state.isShiftKeyPressed, this.state.isCtrlKeyPressed);
-    const grid = this.state.grid;
+    console.log("render grid called", this.state);
+    const { grid, isVisualizing } = this.state;
     return (
       <>
       <div className="interface">
-        <Button 
-        disabled={this.state.isVisualizing} 
-        onClick={() => this.runDijkstra()}>
-          Visualize Dijkstra's Algorithm
-        </Button>
-        <Button onClick={() => this.resetGrid()}>
-          Reset Grid
-        </Button>
-        <Button onClick={() => this.testButtonFunct()}>
-          Test
-        </Button>
+        <AppBar position="absolute">
+          <Toolbar>
+            <Typography align="left" variant="h5">
+              Pathfinding Visualizer
+            </Typography>
+            <Typography variant="h6">
+              Test1
+            </Typography>
+            <Typography variant="h7">
+              Test2
+            </Typography>
+            <StyledButton>Test3</StyledButton>
+            <SelectedMenu />
+          </Toolbar>
+        </AppBar>
       </div>
-      <div className="grid">
+      <div className="grid" 
+      onKeyDown={(e) => this.handleOnKeyDown(e)} 
+      onKeyUp={(e) => this.handleOnKeyUp(e)}
+      onMouseDown={(e) => this.handleOnMouseDown(e)}>
         {grid.map((row, rowIdx) => {
           return (
             <div id={`row-${rowIdx}`} key={rowIdx}>
@@ -220,16 +252,4 @@ export default class PathfindingVisualizer extends Component {
       </>
     );
   }
-}
-
-// Backtracks from the targetNode to find the shortest path.
-// Only works when called after a graph alg
-function getNodesInShortestPathOrder(targetGraphNode) {
-  const nodesInShortestPathOrder = [];
-  let currentNode = targetGraphNode;
-  while (currentNode !== null) {
-    nodesInShortestPathOrder.unshift(currentNode);
-    currentNode = currentNode.previousNode;
-  }
-  return nodesInShortestPathOrder;
 }
