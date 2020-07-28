@@ -8,6 +8,10 @@
   outline: 1px solid black;
 }
 
+.ListItemText {
+  color: white;
+}
+
 .cursor {
   width: 3rem;
   height: 3rem;

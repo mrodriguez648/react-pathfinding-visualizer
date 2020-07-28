@@ -19,7 +19,15 @@ var FINISH_NODE_COL = Math.floor(Math.random() * COL_COUNT);
 while(FINISH_NODE_COL === START_NODE_COL) {
   FINISH_NODE_COL = Math.floor(Math.random() * COL_COUNT);
 }
+
 let ANIMATION_TIMEOUTS = [];
+
+const ALGO_NAMES = [
+  'Dijstrka\'s',
+  'A* Search',
+  'BFS',
+  'DFS'
+]
 
 const StyledButton = withStyles({
   root: {
@@ -29,9 +37,7 @@ const StyledButton = withStyles({
     color: 'white',
     height: 48,
     padding: '0 30px',
-    marginRight: 20,
-    marginLeft: 20,
-    boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
+    margin: '0 25px'
   },
   label: {
     textTransform: 'capitalize',
@@ -43,6 +49,7 @@ export default class PathfindingVisualizer extends Component {
     super(props);
     this.state = {
       grid: this.initGrid(),
+      selectedAlgo: ALGO_NAMES[0],
       isShiftKeyPressed: false,
       isCtrlKeyPressed: false,
       isMouseDown: false,
@@ -59,6 +66,10 @@ export default class PathfindingVisualizer extends Component {
     )
     newGrid[row][col] = updatedNode;
     this.setState({ grid: newGrid });
+  }
+
+  setSelectedAlgo = (algoIndex) => {
+    this.setState({ selectedAlgo: ALGO_NAMES[algoIndex] })
   }
 
   // Backtracks from the targetNode to find the shortest path.
@@ -137,8 +148,6 @@ export default class PathfindingVisualizer extends Component {
           isShortestPathNode={false}
           isWall={false}
           updateWallNode={this.updateWallNode}
-          // onKeyDown={this.handleOnKeyDown}
-          // onKeyUp={this.handleOnKeyUp}
           onMouseEnter={this.handleOnMouseEnter}>
         </Node>
         currentRow.push(node);
@@ -215,23 +224,22 @@ export default class PathfindingVisualizer extends Component {
 
   render() {
     console.log("render grid called", this.state);
-    const { grid, isVisualizing } = this.state;
+    const { grid, isVisualizing, selectedAlgo } = this.state;
     return (
       <>
       <div className="interface">
-        <AppBar position="absolute">
+        <AppBar position="static">
           <Toolbar>
             <Typography align="left" variant="h5">
               Pathfinding Visualizer
             </Typography>
-            <Typography variant="h6">
-              Test1
-            </Typography>
-            <Typography variant="h7">
-              Test2
-            </Typography>
-            <StyledButton>Test3</StyledButton>
-            <SelectedMenu />
+            <SelectedMenu options={ALGO_NAMES} changeAlgo={this.setSelectedAlgo}/>
+            <StyledButton onClick={this.runDijkstra} disabled={isVisualizing}>
+              Run {selectedAlgo}
+            </StyledButton>
+            <StyledButton onClick={this.resetGrid}>
+              Reset Grid
+            </StyledButton>
           </Toolbar>
         </AppBar>
       </div>
