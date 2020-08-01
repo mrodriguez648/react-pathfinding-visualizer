@@ -87,12 +87,12 @@ export default class PathfindingVisualizer extends Component {
     console.log("onKeyDown fired");
     switch(e.keyCode) {
       case 16:
-        if(!this.state.isCtrlKeyPressed) {
+        if(!this.state.isCtrlKeyPressed && !this.state.isShiftKeyPressed) {
           this.setState({ isShiftKeyPressed: !this.state.isShiftKeyPressed });
         }
         break;
       case 17:
-        if(!this.state.isShiftKeyPressed) {
+        if(!this.state.isShiftKeyPressed && !this.state.isCtrlKeyPressed) {
           this.setState({ isCtrlKeyPressed: !this.state.isCtrlKeyPressed });
         }
         break;
