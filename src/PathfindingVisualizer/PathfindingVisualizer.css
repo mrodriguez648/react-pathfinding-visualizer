@@ -1,3 +1,7 @@
+.menuItemText {
+  color: white;
+}
+
 .grid {
   margin: 10px;
 }
@@ -12,7 +16,7 @@
   color: white;
 }
 
-.cursor {
+/* .cursor {
   width: 3rem;
   height: 3rem;
   border: 2px solid block;
@@ -24,4 +28,4 @@
   transition-property: background, border, transform;
   transform-origin: 150% 150%;
   z-index: 999;
-}
+} */

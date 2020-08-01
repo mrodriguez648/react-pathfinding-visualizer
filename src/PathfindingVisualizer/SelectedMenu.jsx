@@ -5,15 +5,11 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import { white } from 'color-name';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     padding: '0 30px',
     margin: '0 25px'
-  },
-  menuItemText: {
-    color: white
   }
 }));
 
@@ -48,8 +44,8 @@ export default function SimpleListMenu(props) {
           onClick={handleClickListItem}
         >
           <ListItemText
-          primaryTypographyProps={{ variant: "button" }} 
-          secondaryTypographyProps={{ color: "white" }} 
+          primaryTypographyProps={{ variant: "button" }}
+          secondaryTypographyProps={{ color: "initial" }}
           primary="Choose an algorithm" 
           secondary={options[selectedIndex]} 
           />

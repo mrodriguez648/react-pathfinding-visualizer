@@ -7,8 +7,8 @@ import { withStyles } from '@material-ui/core/styles'
 
 import './PathfindingVisualizer.css';
 
-const ROW_COUNT = 5;
-const COL_COUNT = 8;
+const ROW_COUNT = 15;
+const COL_COUNT = 25;
 const START_NODE_ROW = Math.floor(Math.random() * ROW_COUNT);
 const START_NODE_COL = Math.floor(Math.random() * COL_COUNT);
 var FINISH_NODE_ROW = Math.floor(Math.random() * ROW_COUNT);
@@ -31,17 +31,16 @@ const ALGO_NAMES = [
 
 const StyledButton = withStyles({
   root: {
-    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+    outline: '2px solid white',
     borderRadius: 3,
-    border: 0,
+    border: 1,
     color: 'white',
     height: 48,
     padding: '0 30px',
-    margin: '0 25px'
+    margin: '0 25px',
+    '&$disabled': { color: 'red' },
   },
-  label: {
-    textTransform: 'capitalize',
-  },
+  disabled: {},
 })(Button);
 
 export default class PathfindingVisualizer extends Component {
@@ -57,12 +56,12 @@ export default class PathfindingVisualizer extends Component {
     };
   }
 
-  updateWallNode = (row, col, isWallProp) => {
+  updateWallNode = (row, col, newWallProp) => {
     const newGrid = this.state.grid;
     const oldNode = newGrid[row][col];
     const updatedNode = React.cloneElement(
       oldNode,
-      {isWall: isWallProp}
+      {isWall: newWallProp}
     )
     newGrid[row][col] = updatedNode;
     this.setState({ grid: newGrid });
@@ -223,7 +222,6 @@ export default class PathfindingVisualizer extends Component {
   }
 
   render() {
-    console.log("render grid called", this.state);
     const { grid, isVisualizing, selectedAlgo } = this.state;
     return (
       <>

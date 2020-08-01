@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
 import './Node.css';
 
@@ -13,7 +13,6 @@ export default class Node extends Component {
   }
 
   render() {
-    console.log("node render called");
     const {
       nodeNum,
       row,
@@ -55,7 +54,7 @@ export default class Node extends Component {
   }
 
   handleOnMouseEnter = () => {
-    console.log("onMouseEnter fired");  
+    console.log("onMouseEnter fired");
     if (this.props.isStart || this.props.isFinish) return null;
     this.props.onMouseEnter(this.props.row, this.props.col, this.props.isWall);
   }

@@ -57,7 +57,6 @@ function updateUnvisitedNeighbors(node, graphNodes, grid) {
 function getUnvisitedNeighbors(node, graphNodes, grid) {
   const neighbors = [];
   const {row, col} = node.props;
-  debugger;
   // top neighbor
   if (row > 0) neighbors.push(graphNodes[grid[row - 1][col].props.nodeNum]);
   // bottom
