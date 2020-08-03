@@ -16,21 +16,21 @@ const useStyles = makeStyles((theme) => ({
 export default function SimpleListMenu(props) {
   const { options } = props;
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorElement, setAnchorElement] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
 
   const handleClickListItem = (event) => {
-    setAnchorEl(event.currentTarget);
+    setAnchorElement(event.currentTarget);
   };
 
   const handleMenuItemClick = (event, index) => {
     setSelectedIndex(index);
-    setAnchorEl(null);
+    setAnchorElement(null);
     props.changeAlgo(index);
   };
 
   const handleClose = () => {
-    setAnchorEl(null);
+    setAnchorElement(null);
   };
 
   return (
@@ -53,9 +53,9 @@ export default function SimpleListMenu(props) {
       </List>
       <Menu
         id="lock-menu"
-        anchorEl={anchorEl}
+        anchorEl={anchorElement}
         keepMounted
-        open={Boolean(anchorEl)}
+        open={Boolean(anchorElement)}
         onClose={handleClose}
       >
         {options.map((option, index) => (

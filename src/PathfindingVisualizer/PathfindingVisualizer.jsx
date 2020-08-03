@@ -7,6 +7,7 @@ import { withStyles } from '@material-ui/core/styles'
 
 import './PathfindingVisualizer.css';
 
+const isMobile = (window.innerWidth <= 800);
 const ROW_COUNT = 15;
 const COL_COUNT = 25;
 const START_NODE_ROW = Math.floor(Math.random() * ROW_COUNT);
@@ -117,6 +118,23 @@ export default class PathfindingVisualizer extends Component {
     }
   }
 
+  handleOnKeyPress = (e) => {
+    console.log("onKeyPressed fired");
+    switch(e.keyCode) {
+      case 16:
+        if(!this.state.isCtrlKeyPressed) {
+          this.setState({ isShiftKeyPressed: !this.state.isShiftKeyPressed });
+        }
+        break;
+      case 17:
+        if(!this.state.isShiftKeyPressed) {
+          this.setState({ isCtrlKeyPressed: !this.state.isCtrlKeyPressed });
+        }
+        break;
+      default:
+    }
+  }
+
   handleOnMouseDown = () => {
     console.log("mouseDown fired");
     this.setState({ mouseIsPressed: !this.state.mouseIsPressed });
@@ -174,6 +192,7 @@ export default class PathfindingVisualizer extends Component {
     const targetNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];   
     const visitedGraphNodesInOrder = dijkstra(grid, startNode, targetNode);
     const [targetGraphNode] = visitedGraphNodesInOrder.slice(-1);
+    debugger;
     const shortestPathGraphNodes = this.getNodesInShortestPathOrder(targetGraphNode);
     ANIMATION_TIMEOUTS = this.animateDijsktra(visitedGraphNodesInOrder, shortestPathGraphNodes);
   }
@@ -223,39 +242,50 @@ export default class PathfindingVisualizer extends Component {
 
   render() {
     const { grid, isVisualizing, selectedAlgo } = this.state;
-    return (
-      <>
-      <div className="interface">
-        <AppBar position="static">
-          <Toolbar>
-            <Typography align="left" variant="h5">
-              Pathfinding Visualizer
-            </Typography>
-            <SelectedMenu options={ALGO_NAMES} changeAlgo={this.setSelectedAlgo}/>
-            <StyledButton onClick={this.runDijkstra} disabled={isVisualizing}>
-              Run {selectedAlgo}
-            </StyledButton>
-            <StyledButton onClick={this.resetGrid}>
-              Reset Grid
-            </StyledButton>
-          </Toolbar>
-        </AppBar>
-      </div>
-      <div className="grid" 
-      onKeyDown={(e) => this.handleOnKeyDown(e)} 
-      onKeyUp={(e) => this.handleOnKeyUp(e)}
-      onMouseDown={(e) => this.handleOnMouseDown(e)}>
-        {grid.map((row, rowIdx) => {
-          return (
-            <div id={`row-${rowIdx}`} key={rowIdx}>
-              {row.map((node) => {
-                return node;
-              })}
-            </div>
-          );
-        })}
-      </div>
-      </>
-    );
+    if(isMobile) {
+      return (
+        <div className="mobile-response">
+          <Typography className="mobile-text" color="error" variant="h4">
+            Sorry, this app isn't mobile responsive yet! WIP!
+          </Typography>
+        </div>
+      );
+    }
+    else {
+      return (
+        <>
+        <div className="interface">
+          <AppBar position="static">
+            <Toolbar>
+              <Typography align="left" variant="h5">
+                Pathfinding Visualizer
+              </Typography>
+              <SelectedMenu options={ALGO_NAMES} changeAlgo={this.setSelectedAlgo}/>
+              <StyledButton onClick={this.runDijkstra} disabled={isVisualizing}>
+                Run {selectedAlgo}
+              </StyledButton>
+              <StyledButton onClick={this.resetGrid}>
+                Reset Grid
+              </StyledButton>
+            </Toolbar>
+          </AppBar>
+        </div>
+        <div className="grid" 
+        onKeyDown={(e) => this.handleOnKeyDown(e)} 
+        onKeyUp={(e) => this.handleOnKeyUp(e)}
+        onMouseDown={(e) => this.handleOnMouseDown(e)}>
+          {grid.map((row, rowIdx) => {
+            return (
+              <div id={`row-${rowIdx}`} key={rowIdx}>
+                {row.map((node) => {
+                  return node;
+                })}
+              </div>
+            );
+          })}
+        </div>
+        </>
+      );
+    }
   }
 }

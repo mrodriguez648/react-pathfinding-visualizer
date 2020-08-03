@@ -1,7 +1,8 @@
 {
-  "name": "react-pathfinding-visualizer",
+  "name": "pathfinding-visualizer",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/pathfinding-visualizer/",
   "dependencies": {
     "@material-ui/core": "4.9.14",
     "@material-ui/icons": "^4.9.1",
@@ -16,7 +17,11 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "purge": "rm -rf ../mrodriguez.648.github.io/pathfinding-visualizer/static && cp -fR ./build/* ../mrodriguez648.github.io/pathfinding-visualizer",
+    "frontmatter": "echo '---\ntitle: Pathfinding Visualizer\nlayout: null\n---\n' | cat - ../mrodriguez648.github.io/pathfinding-visualizer/index.html > temp && mv temp ../mrodriguez648.github.io/pathfinding-visualizer/index.html",
+    "deploy": "npm run purge && npm run frontmatter"
   },
   "eslintConfig": {
     "extends": "react-app"

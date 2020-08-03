@@ -12,10 +12,20 @@
   outline: 1px solid black;
 }
 
-.ListItemText {
+.mobile-response {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%)
+}
+
+.mobile-response .mobile-text {
+  background: black;
   color: white;
 }
 
+/* Potential cursor change */
 /* .cursor {
   width: 3rem;
   height: 3rem;
