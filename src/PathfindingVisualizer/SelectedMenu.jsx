@@ -1,32 +1,37 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import MenuItem from '@material-ui/core/MenuItem';
-import Menu from '@material-ui/core/Menu';
+import React from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import {
+  List,
+  ListItem,
+  ListItemText,
+  MenuItem,
+  Menu
+} from "@material-ui/core";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: '0 30px',
-    margin: '0 25px'
-  }
-}));
+const useStyles = makeStyles(
+  {
+    root: {
+      padding: "0 30px",
+      margin: "0 25px"
+    }
+  },
+  { name: "SelectedMenu" }
+);
 
 export default function SimpleListMenu(props) {
-  const { options } = props;
+  const { changeAlgo, options } = props;
   const classes = useStyles();
   const [anchorElement, setAnchorElement] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
 
-  const handleClickListItem = (event) => {
+  const handleClickListItem = event => {
     setAnchorElement(event.currentTarget);
   };
 
   const handleMenuItemClick = (event, index) => {
     setSelectedIndex(index);
     setAnchorElement(null);
-    props.changeAlgo(index);
+    changeAlgo(options[index]);
   };
 
   const handleClose = () => {
@@ -44,10 +49,10 @@ export default function SimpleListMenu(props) {
           onClick={handleClickListItem}
         >
           <ListItemText
-          primaryTypographyProps={{ variant: "button" }}
-          secondaryTypographyProps={{ color: "initial" }}
-          primary="Choose an algorithm" 
-          secondary={options[selectedIndex]} 
+            primaryTypographyProps={{ variant: "button" }}
+            secondaryTypographyProps={{ color: "initial" }}
+            primary="Choose an algorithm"
+            secondary={options[selectedIndex]}
           />
         </ListItem>
       </List>
@@ -62,7 +67,7 @@ export default function SimpleListMenu(props) {
           <MenuItem
             key={option}
             selected={index === selectedIndex}
-            onClick={(event) => handleMenuItemClick(event, index)}
+            onClick={event => handleMenuItemClick(event, index)}
           >
             {option}
           </MenuItem>

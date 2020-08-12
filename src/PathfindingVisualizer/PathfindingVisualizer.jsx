@@ -1,80 +1,57 @@
-import React, { Component } from 'react';
-import Node from './Node/Node';
-import SelectedMenu from './SelectedMenu';
-import { dijkstra } from '../algorithms/dijkstra';
-import { Button, AppBar, Toolbar, Typography } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles'
+import React, { Component } from "react";
+import Node from "./Node/Node";
+import { dijkstra } from "../algorithms/dijkstra";
+import { Typography } from "@material-ui/core";
+import Interface from "./AppBarInterface";
+import StyledSnackbar from "./Snackbar";
 
-import './PathfindingVisualizer.css';
+import "./PathfindingVisualizer.css";
 
-const isMobile = (window.innerWidth <= 800);
-const ROW_COUNT = 15;
-const COL_COUNT = 25;
-const START_NODE_ROW = Math.floor(Math.random() * ROW_COUNT);
-const START_NODE_COL = Math.floor(Math.random() * COL_COUNT);
-var FINISH_NODE_ROW = Math.floor(Math.random() * ROW_COUNT);
-while(FINISH_NODE_ROW === START_NODE_ROW) {
-  FINISH_NODE_ROW = Math.floor(Math.random() * ROW_COUNT);
-}
-var FINISH_NODE_COL = Math.floor(Math.random() * COL_COUNT);
-while(FINISH_NODE_COL === START_NODE_COL) {
-  FINISH_NODE_COL = Math.floor(Math.random() * COL_COUNT);
-}
+const isMobile = window.innerWidth <= 800;
 
 let ANIMATION_TIMEOUTS = [];
 
-const ALGO_NAMES = [
-  'Dijstrka\'s',
-  'A* Search',
-  'BFS',
-  'DFS'
-]
-
-const StyledButton = withStyles({
-  root: {
-    outline: '2px solid white',
-    borderRadius: 3,
-    border: 1,
-    color: 'white',
-    height: 48,
-    padding: '0 30px',
-    margin: '0 25px',
-    '&$disabled': { color: 'red' },
-  },
-  disabled: {},
-})(Button);
+const ALGO_NAMES = ["Dijstrka's", "A* Search", "BFS", "DFS"];
 
 export default class PathfindingVisualizer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      grid: this.initGrid(),
-      selectedAlgo: ALGO_NAMES[0],
-      isShiftKeyPressed: false,
-      isCtrlKeyPressed: false,
+      rowCount: props.rowCount,
+      colCount: props.colCount,
+      startNodeRow: props.startNodeRow,
+      startNodeCol: props.startNodeCol,
+      targetNodeRow: props.targetNodeRow,
+      targetNodeCol: props.targetNodeCol,
+      shiftKeyMode: false,
+      ctrlKeyMode: false,
       isMouseDown: false,
-      isVisualizing: false
+      grid: this.initGrid(
+        props.rowCount,
+        props.colCount,
+        props.startNodeRow,
+        props.startNodeCol,
+        props.targetNodeRow,
+        props.targetNodeCol
+      )
     };
   }
 
   updateWallNode = (row, col, newWallProp) => {
     const newGrid = this.state.grid;
     const oldNode = newGrid[row][col];
-    const updatedNode = React.cloneElement(
-      oldNode,
-      {isWall: newWallProp}
-    )
+    const updatedNode = React.cloneElement(oldNode, { isWall: newWallProp });
     newGrid[row][col] = updatedNode;
     this.setState({ grid: newGrid });
-  }
+  };
 
-  setSelectedAlgo = (algoIndex) => {
-    this.setState({ selectedAlgo: ALGO_NAMES[algoIndex] })
-  }
+  setSelectedAlgo = index => {
+    this.setState({ selectedAlgo: ALGO_NAMES[index] });
+  };
 
   // Backtracks from the targetNode to find the shortest path.
   // Only works when called after a graph alg
-  getNodesInShortestPathOrder = (targetGraphNode) => {
+  getNodesInShortestPathOrder = targetGraphNode => {
     const nodesInShortestPathOrder = [];
     let currentNode = targetGraphNode;
     while (currentNode !== null) {
@@ -82,91 +59,70 @@ export default class PathfindingVisualizer extends Component {
       currentNode = currentNode.previousNode;
     }
     return nodesInShortestPathOrder;
-  }
+  };
 
-  handleOnKeyDown = (e) => {
-    console.log("onKeyDown fired");
-    switch(e.keyCode) {
-      case 16:
-        if(!this.state.isCtrlKeyPressed && !this.state.isShiftKeyPressed) {
-          this.setState({ isShiftKeyPressed: !this.state.isShiftKeyPressed });
-        }
-        break;
-      case 17:
-        if(!this.state.isShiftKeyPressed && !this.state.isCtrlKeyPressed) {
-          this.setState({ isCtrlKeyPressed: !this.state.isCtrlKeyPressed });
-        }
-        break;
-      default:
+  handleOnKeyDown = e => {
+    console.log("onKeyDown fired", this.state);
+    if (e.repeat) {
+      console.log("repeat fire");
+      return;
     }
-  }
-
-  handleOnKeyUp = (e) => {
-    console.log("onKeyUp fired");
-    switch(e.keyCode) {
-      case 16:
-        if(!this.state.isCtrlKeyPressed) {
-          this.setState({ isShiftKeyPressed: !this.state.isShiftKeyPressed });
-        }
-        break;
-      case 17:
-        if(!this.state.isShiftKeyPressed) {
-          this.setState({ isCtrlKeyPressed: !this.state.isCtrlKeyPressed });
-        }
-        break;
-      default:
+    if (e.shiftKey) {
+      this.setState({
+        shiftKeyMode: !this.state.shiftKeyMode,
+        ctrlKeyMode: false
+      });
+    } else if (e.ctrlKey) {
+      this.setState({
+        ctrlKeyMode: !this.state.ctrlKeyMode,
+        shiftKeyMode: false
+      });
     }
-  }
-
-  handleOnKeyPress = (e) => {
-    console.log("onKeyPressed fired");
-    switch(e.keyCode) {
-      case 16:
-        if(!this.state.isCtrlKeyPressed) {
-          this.setState({ isShiftKeyPressed: !this.state.isShiftKeyPressed });
-        }
-        break;
-      case 17:
-        if(!this.state.isShiftKeyPressed) {
-          this.setState({ isCtrlKeyPressed: !this.state.isCtrlKeyPressed });
-        }
-        break;
-      default:
-    }
-  }
-
-  handleOnMouseDown = () => {
-    console.log("mouseDown fired");
-    this.setState({ mouseIsPressed: !this.state.mouseIsPressed });
-  }
+  };
 
   handleOnMouseEnter = (row, col, isWallState) => {
-    if 
-    ((this.state.isShiftKeyPressed && !isWallState) || (this.state.isCtrlKeyPressed && isWallState)) {
+    if (
+      (this.state.shiftKeyMode && !isWallState) ||
+      (this.state.ctrlKeyMode && isWallState)
+    ) {
       this.updateWallNode(row, col, !isWallState);
     }
-  }
-  
-  initGrid = () => {
+  };
+
+  initGrid = (
+    rowCount,
+    colCount,
+    startNodeRow,
+    startNodeCol,
+    targetNodeRow,
+    targetNodeCol
+  ) => {
+    while (targetNodeRow === startNodeRow) {
+      targetNodeRow = Math.floor(Math.random() * rowCount);
+    }
+    while (targetNodeCol === startNodeCol) {
+      targetNodeCol = Math.floor(Math.random() * colCount);
+    }
     const grid = [];
     let nodeCount = 0;
-    for (let row = 0; row < ROW_COUNT; row++) {
+    for (let row = 0; row < rowCount; row++) {
       const currentRow = [];
-      for (let col = 0; col < COL_COUNT; col++) {
-        const node = 
-        <Node
-          key={nodeCount}
-          nodeNum={nodeCount}
-          row={row}
-          col={col}
-          isStart={row === START_NODE_ROW && col === START_NODE_COL}
-          isFinish={row === FINISH_NODE_ROW && col === FINISH_NODE_COL}
-          isGraphNode={false}
-          isShortestPathNode={false}
-          isWall={false}
-          updateWallNode={this.updateWallNode}
-          onMouseEnter={this.handleOnMouseEnter}>
-        </Node>
+      for (let col = 0; col < colCount; col++) {
+        const node = (
+          <Node
+            key={nodeCount}
+            nodeNum={nodeCount}
+            row={row}
+            col={col}
+            isStart={row === startNodeRow && col === startNodeCol}
+            isTarget={row === targetNodeRow && col === targetNodeCol}
+            isGraphNode={false}
+            isShortestPathNode={false}
+            isWall={false}
+            updateWallNode={this.updateWallNode}
+            onMouseEnter={this.handleOnMouseEnter}
+          ></Node>
+        );
         currentRow.push(node);
         nodeCount += 1;
       }
@@ -176,73 +132,100 @@ export default class PathfindingVisualizer extends Component {
   };
 
   resetGrid = () => {
+    const {
+      rowCount,
+      colCount,
+      startNodeRow,
+      startNodeCol,
+      targetNodeRow,
+      targetNodeCol
+    } = this.state;
     // clear in progress and queued animations
     for (let i = 0; i < ANIMATION_TIMEOUTS.length; i++) {
       clearTimeout(ANIMATION_TIMEOUTS[i]);
     }
-    const newGrid = this.initGrid();
+    const newGrid = this.initGrid(
+      rowCount,
+      colCount,
+      startNodeRow,
+      startNodeCol,
+      targetNodeRow,
+      targetNodeCol
+    );
     ANIMATION_TIMEOUTS = [];
     this.setState({ grid: newGrid, isVisualizing: false });
-  }
+  };
 
   runDijkstra = () => {
     this.setState({ isVisualizing: true });
-    const { grid } = this.state;
-    const startNode = grid[START_NODE_ROW][START_NODE_COL];
-    const targetNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];   
+    const {
+      startNodeRow,
+      startNodeCol,
+      targetNodeRow,
+      targetNodeCol,
+      grid
+    } = this.state;
+    const startNode = grid[startNodeRow][startNodeCol];
+    const targetNode = grid[targetNodeRow][targetNodeCol];
     const visitedGraphNodesInOrder = dijkstra(grid, startNode, targetNode);
     const [targetGraphNode] = visitedGraphNodesInOrder.slice(-1);
-    debugger;
-    const shortestPathGraphNodes = this.getNodesInShortestPathOrder(targetGraphNode);
-    ANIMATION_TIMEOUTS = this.animateDijsktra(visitedGraphNodesInOrder, shortestPathGraphNodes);
-  }
+    if (targetGraphNode.props.nodeNum !== targetNode.props.nodeNum) {
+    }
+    const shortestPathGraphNodes = this.getNodesInShortestPathOrder(
+      targetGraphNode
+    );
+    ANIMATION_TIMEOUTS = this.animateDijsktra(
+      visitedGraphNodesInOrder,
+      shortestPathGraphNodes
+    );
+  };
 
   animateDijsktra = (visitedNodesInOrder, shortestPathGraphNodes) => {
     const timeouts = [];
     let t = 0;
     // animate graph nodes traversed by algo
     for (let i = 0; i < visitedNodesInOrder.length; i++, t++) {
-      timeouts.push(setTimeout(() => {
-        const node = visitedNodesInOrder[i];
-        const newGrid = this.state.grid;
-        const newNode = React.cloneElement(
-          node,
-          {isGraphNode: true}
-        );
-        newGrid[node.props.row][node.props.col] = newNode;
-        this.setState({ grid: newGrid });
-      }, 15 * t));
+      timeouts.push(
+        setTimeout(() => {
+          const node = visitedNodesInOrder[i];
+          const newGrid = this.state.grid;
+          const newNode = React.cloneElement(node, { isGraphNode: true });
+          newGrid[node.props.row][node.props.col] = newNode;
+          this.setState({ grid: newGrid });
+        }, 15 * t)
+      );
     }
 
     // animate shortest path obtained through backwards propegation
     for (let i = 0; i < shortestPathGraphNodes.length; i++, t++) {
-      timeouts.push(setTimeout(() => {
-        const node = shortestPathGraphNodes[i];
-        const newGrid = this.state.grid;
-        const newNode = React.cloneElement(
-          node,
-          {isShortestPathNode: true}
-        );
-        newGrid[node.props.row][node.props.col] = newNode;
-        this.setState({ grid: newGrid }); 
-      }, 20 * t));
+      timeouts.push(
+        setTimeout(() => {
+          const node = shortestPathGraphNodes[i];
+          const newGrid = this.state.grid;
+          const newNode = React.cloneElement(node, {
+            isShortestPathNode: true
+          });
+          newGrid[node.props.row][node.props.col] = newNode;
+          this.setState({ grid: newGrid });
+        }, 20 * t)
+      );
     }
     return timeouts;
-  }
-
-  testButtonFunct = () => {
-    const baseNode = this.state.grid[0][0];
-    console.log("test funct node", baseNode);
-    const newNode = React.cloneElement(
-      baseNode,
-      {isGraphNode: true}
-    );
-    console.log("test funct new node", newNode);
-  }
+  };
 
   render() {
-    const { grid, isVisualizing, selectedAlgo } = this.state;
-    if(isMobile) {
+    console.log("grid rendered", this.state);
+    const { grid, ctrlKeyMode, shiftKeyMode } = this.state;
+
+    const colorMode = ctrlKeyMode ? "red" : shiftKeyMode ? "green" : "default";
+
+    const snackbarMsg = ctrlKeyMode
+      ? "Mode: Deleting Walls"
+      : shiftKeyMode
+      ? "Mode: Building Walls"
+      : "";
+
+    if (isMobile) {
       return (
         <div className="mobile-response">
           <Typography className="mobile-text" color="error" variant="h4">
@@ -250,40 +233,35 @@ export default class PathfindingVisualizer extends Component {
           </Typography>
         </div>
       );
-    }
-    else {
+    } else {
       return (
         <>
-        <div className="interface">
-          <AppBar position="static">
-            <Toolbar>
-              <Typography align="left" variant="h5">
-                Pathfinding Visualizer
-              </Typography>
-              <SelectedMenu options={ALGO_NAMES} changeAlgo={this.setSelectedAlgo}/>
-              <StyledButton onClick={this.runDijkstra} disabled={isVisualizing}>
-                Run {selectedAlgo}
-              </StyledButton>
-              <StyledButton onClick={this.resetGrid}>
-                Reset Grid
-              </StyledButton>
-            </Toolbar>
-          </AppBar>
-        </div>
-        <div className="grid" 
-        onKeyDown={(e) => this.handleOnKeyDown(e)} 
-        onKeyUp={(e) => this.handleOnKeyUp(e)}
-        onMouseDown={(e) => this.handleOnMouseDown(e)}>
-          {grid.map((row, rowIdx) => {
-            return (
-              <div id={`row-${rowIdx}`} key={rowIdx}>
-                {row.map((node) => {
-                  return node;
-                })}
-              </div>
-            );
-          })}
-        </div>
+          <div className="interfance">
+            <Interface
+              runDijkstra={this.runDijkstra}
+              resetGrid={this.resetGrid}
+              appBarColor={colorMode}
+            />
+          </div>
+          <div className="grid" onKeyDown={e => this.handleOnKeyDown(e)}>
+            {grid.map((row, rowIdx) => {
+              return (
+                <div id={`row-${rowIdx}`} key={rowIdx}>
+                  {row.map(node => {
+                    return node;
+                  })}
+                </div>
+              );
+            })}
+          </div>
+          <div className="snackbar">
+            <StyledSnackbar
+              msg={snackbarMsg}
+              shiftMode={shiftKeyMode}
+              ctrlMode={ctrlKeyMode}
+              openStatus={shiftKeyMode || ctrlKeyMode}
+            />
+          </div>
         </>
       );
     }

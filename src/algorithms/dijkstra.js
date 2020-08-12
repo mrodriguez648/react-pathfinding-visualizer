@@ -30,7 +30,7 @@ function initGraphNodes(grid) {
         isVisited: false,
         distance: Infinity,
         previousNode: null
-      }
+      };
       unvisitedNodes.push(newNode);
     }
   }
@@ -39,9 +39,7 @@ function initGraphNodes(grid) {
 
 // Sort call used to update minimum node within unvisited nodes data structure
 function sortNodesByDistance(unvisitedNodes) {
-  unvisitedNodes.sort((nodeA, nodeB) => 
-    nodeA.distance - nodeB.distance
-  );
+  unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
 }
 
 // Updates adjacent nodes to reflect current distance and store previously connected node within current shortest path
@@ -56,14 +54,16 @@ function updateUnvisitedNeighbors(node, graphNodes, grid) {
 // Retrieve adjacent graph nodes that have not been marked as visited
 function getUnvisitedNeighbors(node, graphNodes, grid) {
   const neighbors = [];
-  const {row, col} = node.props;
+  const { row, col } = node.props;
   // top neighbor
   if (row > 0) neighbors.push(graphNodes[grid[row - 1][col].props.nodeNum]);
   // bottom
-  if (row < grid.length - 1) neighbors.push(graphNodes[grid[row + 1][col].props.nodeNum]);
+  if (row < grid.length - 1)
+    neighbors.push(graphNodes[grid[row + 1][col].props.nodeNum]);
   // left
   if (col > 0) neighbors.push(graphNodes[grid[row][col - 1].props.nodeNum]);
   // right
-  if (col < grid[0].length - 1) neighbors.push(graphNodes[grid[row][col + 1].props.nodeNum]);
+  if (col < grid[0].length - 1)
+    neighbors.push(graphNodes[grid[row][col + 1].props.nodeNum]);
   return neighbors.filter(neighbor => !neighbor.isVisited);
 }
