@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Node from "./Node/Node";
 import { dijkstra } from "../algorithms/dijkstra";
 import { Typography } from "@material-ui/core";
-import Interface from "./AppBarInterface";
+import Interface from "./Interface";
 import StyledSnackbar from "./Snackbar";
 
 import "./PathfindingVisualizer.css";
@@ -236,7 +236,7 @@ export default class PathfindingVisualizer extends Component {
     } else {
       return (
         <>
-          <div className="interfance">
+          <div className="interface">
             <Interface
               runDijkstra={this.runDijkstra}
               resetGrid={this.resetGrid}

@@ -21,7 +21,8 @@
     "predeploy": "npm run build",
     "purge": "rm -rf ../mrodriguez.648.github.io/pathfinding-visualizer/static && cp -fR ./build/* ../mrodriguez648.github.io/pathfinding-visualizer",
     "frontmatter": "echo '---\ntitle: Pathfinding Visualizer\nlayout: null\n---\n' | cat - ../mrodriguez648.github.io/pathfinding-visualizer/index.html > temp && mv temp ../mrodriguez648.github.io/pathfinding-visualizer/index.html",
-    "deploy": "npm run purge && npm run frontmatter"
+    "gitcommitmaster": "git add -A && git commit -m 'React app updated, see https://github.com/mrodriguez648/react-pathfinding-visualizer/commits/master && git push -u origin master",
+    "deploy": "npm run purge && npm run frontmatter && npm run gitcommitmaster"
   },
   "eslintConfig": {
     "extends": "react-app"
