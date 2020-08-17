@@ -17,7 +17,7 @@ const useStyles = makeStyles(
 );
 
 export default function CustomizedSnackbars(props) {
-  const { msg, shiftMode, ctrlMode, openProp } = props;
+  const { msg, shiftMode, ctrlMode, openStatus: openProp } = props;
   const [open, setOpen] = React.useState(openProp);
   const classes = useStyles();
   if (openProp !== open) setOpen(openProp);
