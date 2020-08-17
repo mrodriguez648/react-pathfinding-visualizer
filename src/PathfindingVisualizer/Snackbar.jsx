@@ -20,7 +20,7 @@ export default function CustomizedSnackbars(props) {
   const { msg, shiftMode, ctrlMode, openStatus: openProp } = props;
   const [open, setOpen] = React.useState(openProp);
   const classes = useStyles();
-  if (openStatus !== open) setOpen(openStatus);
+  if (openProp !== open) setOpen(openProp);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {

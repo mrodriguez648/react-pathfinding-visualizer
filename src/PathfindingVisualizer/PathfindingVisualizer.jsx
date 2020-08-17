@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Node from "./Node/Node";
 import { dijkstra } from "../algorithms/dijkstra";
 import { Typography } from "@material-ui/core";
-import Interface from "./Interface";
+import Interface from "./Interface/MainInterface";
 import StyledSnackbar from "./Snackbar";
 
 import "./PathfindingVisualizer.css";
@@ -10,8 +10,6 @@ import "./PathfindingVisualizer.css";
 const isMobile = window.innerWidth <= 800;
 
 let ANIMATION_TIMEOUTS = [];
-
-const ALGO_NAMES = ["Dijstrka's", "A* Search", "BFS", "DFS"];
 
 export default class PathfindingVisualizer extends Component {
   constructor(props) {
@@ -45,26 +43,8 @@ export default class PathfindingVisualizer extends Component {
     this.setState({ grid: newGrid });
   };
 
-  setSelectedAlgo = index => {
-    this.setState({ selectedAlgo: ALGO_NAMES[index] });
-  };
-
-  // Backtracks from the targetNode to find the shortest path.
-  // Only works when called after a graph alg
-  getNodesInShortestPathOrder = targetGraphNode => {
-    const nodesInShortestPathOrder = [];
-    let currentNode = targetGraphNode;
-    while (currentNode !== null) {
-      nodesInShortestPathOrder.unshift(currentNode);
-      currentNode = currentNode.previousNode;
-    }
-    return nodesInShortestPathOrder;
-  };
-
   handleOnKeyDown = e => {
-    console.log("onKeyDown fired", this.state);
     if (e.repeat) {
-      console.log("repeat fire");
       return;
     }
     if (e.shiftKey) {
@@ -144,16 +124,39 @@ export default class PathfindingVisualizer extends Component {
     for (let i = 0; i < ANIMATION_TIMEOUTS.length; i++) {
       clearTimeout(ANIMATION_TIMEOUTS[i]);
     }
+    // randomize start and target node positions
+    var newStartNodeRow = Math.floor(Math.random() * rowCount);
+    while (newStartNodeRow === startNodeRow) {
+      newStartNodeRow = Math.floor(Math.random() * rowCount);
+    }
+    var newStartNodeCol = Math.floor(Math.random() * colCount);
+    while (newStartNodeCol === startNodeCol) {
+      newStartNodeCol = Math.floor(Math.random() * colCount);
+    }
+    var newTargetNodeRow = Math.floor(Math.random() * rowCount);
+    while (
+      newTargetNodeRow === targetNodeRow ||
+      newTargetNodeRow === newStartNodeRow
+    ) {
+      newTargetNodeRow = Math.floor(Math.random() * rowCount);
+    }
+    var newTargetNodeCol = Math.floor(Math.random() * colCount);
+    while (
+      newTargetNodeCol === targetNodeCol ||
+      newTargetNodeCol === newStartNodeCol
+    ) {
+      newTargetNodeCol = Math.floor(Math.random() * colCount);
+    }
     const newGrid = this.initGrid(
       rowCount,
       colCount,
-      startNodeRow,
-      startNodeCol,
-      targetNodeRow,
-      targetNodeCol
+      newStartNodeRow,
+      newStartNodeCol,
+      newTargetNodeRow,
+      newTargetNodeCol
     );
     ANIMATION_TIMEOUTS = [];
-    this.setState({ grid: newGrid, isVisualizing: false });
+    this.setState({ startNodeRow: newStartNodeRow, startNodeCol: newStartNodeCol, targetNodeRow: newTargetNodeRow, targetNodeCol: newTargetNodeCol, grid: newGrid, isVisualizing: false });
   };
 
   runDijkstra = () => {
@@ -181,11 +184,11 @@ export default class PathfindingVisualizer extends Component {
   };
 
   animateDijsktra = (visitedNodesInOrder, shortestPathGraphNodes) => {
-    const timeouts = [];
-    let t = 0;
+    const animationTimeouts = [];
+    let t = 1;
     // animate graph nodes traversed by algo
     for (let i = 0; i < visitedNodesInOrder.length; i++, t++) {
-      timeouts.push(
+      animationTimeouts.push(
         setTimeout(() => {
           const node = visitedNodesInOrder[i];
           const newGrid = this.state.grid;
@@ -198,7 +201,7 @@ export default class PathfindingVisualizer extends Component {
 
     // animate shortest path obtained through backwards propegation
     for (let i = 0; i < shortestPathGraphNodes.length; i++, t++) {
-      timeouts.push(
+      animationTimeouts.push(
         setTimeout(() => {
           const node = shortestPathGraphNodes[i];
           const newGrid = this.state.grid;
@@ -210,11 +213,23 @@ export default class PathfindingVisualizer extends Component {
         }, 20 * t)
       );
     }
-    return timeouts;
+
+    return animationTimeouts;
+  };
+
+  // Backtracks from the targetNode to find the shortest path.
+  // Only works when called after a graph alg
+  getNodesInShortestPathOrder = targetGraphNode => {
+    const nodesInShortestPathOrder = [];
+    let currentNode = targetGraphNode;
+    while (currentNode !== null) {
+      nodesInShortestPathOrder.unshift(currentNode);
+      currentNode = currentNode.previousNode;
+    }
+    return nodesInShortestPathOrder;
   };
 
   render() {
-    console.log("grid rendered", this.state);
     const { grid, ctrlKeyMode, shiftKeyMode } = this.state;
 
     const colorMode = ctrlKeyMode ? "red" : shiftKeyMode ? "green" : "default";
@@ -228,7 +243,7 @@ export default class PathfindingVisualizer extends Component {
     if (isMobile) {
       return (
         <div className="mobile-response">
-          <Typography className="mobile-text" color="error" variant="h4">
+          <Typography className="mobile-text" variant="h4">
             Sorry, this app isn't mobile responsive yet! WIP!
           </Typography>
         </div>
