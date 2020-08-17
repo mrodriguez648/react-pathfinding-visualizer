@@ -2,7 +2,7 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { Button, AppBar, Toolbar, Typography } from "@material-ui/core";
 import SelectedMenu from "./SelectedMenu";
-import IntroDialog from "./IntroDialog";
+import IntroDialog from "./IntroDialog"
 
 const ALGO_NAMES = ["Dijstrka's", "A* Search", "BFS", "DFS"];
 
@@ -54,9 +54,9 @@ export default function DynamicCSSInterface(props) {
 
   return (
     <>
-      <div className="intro-dialog">
-        <IntroDialog />
-      </div>
+    <div className="intro-dialog">
+      <IntroDialog />
+    </div>
       <StyledAppBar color={appBarColor} position="static">
         <Toolbar>
           <Typography align="left" variant="h5">
