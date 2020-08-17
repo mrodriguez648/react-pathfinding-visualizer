@@ -7,7 +7,9 @@ export default class Node extends Component {
     return (
       this.props.isGraphNode !== nextProps.isGraphNode ||
       this.props.isShortestPathNode !== nextProps.isShortestPathNode ||
-      this.props.isWall !== nextProps.isWall
+      this.props.isWall !== nextProps.isWall ||
+      this.props.isStart !== nextProps.isStart ||
+      this.props.isTarget !== nextProps.isTarget
     );
   }
 
@@ -20,7 +22,7 @@ export default class Node extends Component {
       isTarget,
       isGraphNode,
       isShortestPathNode,
-      isWall
+      isWall,
     } = this.props;
 
     const stylingClassName = isTarget
