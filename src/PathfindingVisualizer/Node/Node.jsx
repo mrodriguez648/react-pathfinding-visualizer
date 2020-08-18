@@ -41,12 +41,30 @@ export default class Node extends Component {
       <div
         id={`node-${row}-${col}`}
         className={`node ${stylingClassName}`}
+        onMouseDown={this.handleOnMouseDown}
+        onMouseUp={this.handleOnMouseUp}
         onMouseEnter={this.handleOnMouseEnter}
         onClick={this.handleOnClick}
+        onDragStart={e => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
         tabIndex={nodeNum}
       ></div>
     );
   }
+
+  handleOnMouseDown = () => {
+    if (this.props.isStart) {
+      this.props.onMouseDown("start");
+    } else if (this.props.isTarget) {
+      this.props.onMouseDown("target");
+    }
+  };
+
+  handleOnMouseUp = () => {
+    this.props.onMouseUp();
+  };
 
   handleOnClick = () => {
     if (this.props.isStart || this.props.isTarget) return null;

@@ -1,8 +1,8 @@
 import React from "react";
 import Snackbar from "@material-ui/core/Snackbar";
+import { makeStyles } from "@material-ui/core/styles";
 import AddBoxRoundedIcon from "@material-ui/icons/AddBoxRounded";
 import IndeterminateCheckBoxIcon from "@material-ui/icons/IndeterminateCheckBox";
-import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles(
   theme => ({
