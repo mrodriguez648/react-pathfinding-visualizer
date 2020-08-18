@@ -31,7 +31,7 @@ export default class PathfindingVisualizer extends Component {
         props.startNodeRow,
         props.startNodeCol,
         props.targetNodeRow,
-        props.targetNodeCol
+        props.targetNodeCol,
       )
     };
   }
@@ -86,14 +86,6 @@ export default class PathfindingVisualizer extends Component {
     });
   };
 
-  updateSpecialNode = (newRow, newCol, nodeType) => {
-    if (nodeType === "start") {
-      this.updateStartNode(newRow, newCol);
-    } else {
-      this.updateTargetNode(newRow, newCol);
-    }
-  };
-
   updateWallNode = (row, col, newWallProp) => {
     const newGrid = this.state.grid;
     const oldNode = newGrid[row][col];
@@ -130,18 +122,22 @@ export default class PathfindingVisualizer extends Component {
     this.setState({ mouseDownMode: false, mouseDownModeSpecialNodeType: null });
   };
 
-  handleNodeOnMouseEnter = (row, col, isWallState) => {
+  handleNodeOnMouseEnter = (newRow, newCol, isWallState) => {
     const {
       mouseDownMode,
       mouseDownModeSpecialNodeType: nodeType
     } = this.state;
-    if (mouseDownMode) {
-      this.updateSpecialNode(row, col, nodeType);
+    if (mouseDownMode && !isWallState) {
+      if (nodeType === "start") {
+        this.updateStartNode(newRow, newCol);
+      } else {
+        this.updateTargetNode(newRow, newCol);
+      }
     } else if (
       (this.state.shiftKeyMode && !isWallState) ||
       (this.state.ctrlKeyMode && isWallState)
     ) {
-      this.updateWallNode(row, col, !isWallState);
+      this.updateWallNode(newRow, newCol, !isWallState);
     }
   };
 
@@ -151,7 +147,7 @@ export default class PathfindingVisualizer extends Component {
     startNodeRow,
     startNodeCol,
     targetNodeRow,
-    targetNodeCol
+    targetNodeCol,
   ) => {
     while (targetNodeRow === startNodeRow) {
       targetNodeRow = Math.floor(Math.random() * rowCount);
@@ -240,7 +236,6 @@ export default class PathfindingVisualizer extends Component {
         targetNodeRow: newTargetNodeRow,
         targetNodeCol: newTargetNodeCol,
         grid: newGrid,
-        isVisualizing: false
       });
     } else {
       const newGrid = this.initGrid(
@@ -253,14 +248,12 @@ export default class PathfindingVisualizer extends Component {
       );
       this.setState({
         grid: newGrid,
-        isVisualizing: false
       });
     }
     ANIMATION_TIMEOUTS = [];
   };
 
   runDijkstra = () => {
-    this.setState({ isVisualizing: true });
     const {
       startNodeRow,
       startNodeCol,

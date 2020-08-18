@@ -51,7 +51,6 @@ const useStyles = makeStyles({
   }
 });
 
-// Inspired by blueprintjs
 function StyledCheckbox(props) {
   const { setRandomizeNodesCallback } = props;
   const classes = useStyles();

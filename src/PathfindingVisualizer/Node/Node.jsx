@@ -67,7 +67,13 @@ export default class Node extends Component {
   };
 
   handleOnClick = () => {
-    if (this.props.isStart || this.props.isTarget) return null;
+    if (
+      this.props.isStart ||
+      this.props.isTarget ||
+      this.props.isGraphNode ||
+      this.props.isShortestPathNode
+    )
+      return null;
     this.props.updateWallNode(
       this.props.row,
       this.props.col,

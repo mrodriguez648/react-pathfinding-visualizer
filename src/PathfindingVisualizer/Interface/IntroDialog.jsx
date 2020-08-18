@@ -7,6 +7,13 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import Typography from "@material-ui/core/Typography";
 
+const MESSAGES = [
+  "This tool simulates pathfinding algorithms within a grid layout.",
+  "Click on any node on the grid to construct a wall that the algorithm cannot pass through to get to the target node.",
+  "Press the shift key to enter wall building mode, where you can mouse over the grid nodes and turn them into wall nodes.",
+  "Press the ctrl key to enter wall deletion mode, where you can mouseover existing wall nodes on the grid to remove them.",
+  "You can reposition the start/target node by clicking and dragging them into empty nodes."
+];
 const styles = theme => ({
   root: {
     margin: 0,
@@ -44,7 +51,7 @@ const DialogContent = withStyles(theme => ({
   }
 }))(MuiDialogContent);
 
-export default function CustomizedDialogs() {
+export default function CustomizedDialog() {
   const [open, setOpen] = React.useState(true);
 
   const handleClose = () => {
@@ -53,9 +60,6 @@ export default function CustomizedDialogs() {
 
   return (
     <div>
-      {/* <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        Open dialog
-      </Button> */}
       <Dialog
         onClose={handleClose}
         aria-labelledby="customized-dialog-title"
@@ -65,15 +69,13 @@ export default function CustomizedDialogs() {
           Welcome to Pathfinding Visualizer
         </DialogTitle>
         <DialogContent dividers>
-          <Typography gutterBottom>
-            Click on any node on the grid to construct a wall that the algorithm cannot pass through to get to the target node.
-          </Typography>
-          <Typography gutterBottom>
-            Press the shift key to enter wall building mode, where you can mouse over the grid nodes and turn them into wall nodes.
-          </Typography>
-          <Typography gutterBottom>
-            Press the ctrl key to enter wall deletion mode, where you can mouseover existing wall nodes on the grid to remove them.
-          </Typography>
+          {MESSAGES.map((msg, msgIdx) => {
+            return (
+              <div id={`intro-dialog-msg-${msgIdx}`} key={msg}>
+                <Typography gutterBottom>{msg}</Typography>
+              </div>
+            );
+          })}
         </DialogContent>
       </Dialog>
     </div>

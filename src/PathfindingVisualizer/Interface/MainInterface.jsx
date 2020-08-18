@@ -56,7 +56,7 @@ export default function DynamicCSSInterface(props) {
 
   const setRandomizeNodesCallback = () => {
     setRandomizeNodes(!randomizeNodes);
-  }
+  };
 
   return (
     <>
@@ -73,7 +73,9 @@ export default function DynamicCSSInterface(props) {
             Run {selectedAlgo}
           </StyledButton>
           <StyledButton onClick={handleResetGrid}>Reset Grid</StyledButton>
-          <RandomizeCheckBox setRandomizeNodesCallback={setRandomizeNodesCallback} />
+          <RandomizeCheckBox
+            setRandomizeNodesCallback={setRandomizeNodesCallback}
+          />
         </Toolbar>
       </StyledAppBar>
     </>
