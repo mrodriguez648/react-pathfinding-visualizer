@@ -189,7 +189,7 @@ export default class PathfindingVisualizer extends Component {
     return grid;
   };
 
-  resetGrid = () => {
+  resetGrid = randomizeNodes => {
     const {
       rowCount,
       colCount,
@@ -202,46 +202,61 @@ export default class PathfindingVisualizer extends Component {
     for (let i = 0; i < ANIMATION_TIMEOUTS.length; i++) {
       clearTimeout(ANIMATION_TIMEOUTS[i]);
     }
-    // randomize start and target node positions
-    var newStartNodeRow = Math.floor(Math.random() * rowCount);
-    while (newStartNodeRow === startNodeRow) {
-      newStartNodeRow = Math.floor(Math.random() * rowCount);
+    if (randomizeNodes) {
+      // randomize start and target node positions
+      var newStartNodeRow = Math.floor(Math.random() * rowCount);
+      while (newStartNodeRow === startNodeRow) {
+        newStartNodeRow = Math.floor(Math.random() * rowCount);
+      }
+      var newStartNodeCol = Math.floor(Math.random() * colCount);
+      while (newStartNodeCol === startNodeCol) {
+        newStartNodeCol = Math.floor(Math.random() * colCount);
+      }
+      var newTargetNodeRow = Math.floor(Math.random() * rowCount);
+      while (
+        newTargetNodeRow === targetNodeRow ||
+        newTargetNodeRow === newStartNodeRow
+      ) {
+        newTargetNodeRow = Math.floor(Math.random() * rowCount);
+      }
+      var newTargetNodeCol = Math.floor(Math.random() * colCount);
+      while (
+        newTargetNodeCol === targetNodeCol ||
+        newTargetNodeCol === newStartNodeCol
+      ) {
+        newTargetNodeCol = Math.floor(Math.random() * colCount);
+      }
+      const newGrid = this.initGrid(
+        rowCount,
+        colCount,
+        newStartNodeRow,
+        newStartNodeCol,
+        newTargetNodeRow,
+        newTargetNodeCol
+      );
+      this.setState({
+        startNodeRow: newStartNodeRow,
+        startNodeCol: newStartNodeCol,
+        targetNodeRow: newTargetNodeRow,
+        targetNodeCol: newTargetNodeCol,
+        grid: newGrid,
+        isVisualizing: false
+      });
+    } else {
+      const newGrid = this.initGrid(
+        rowCount,
+        colCount,
+        startNodeRow,
+        startNodeCol,
+        targetNodeRow,
+        targetNodeCol
+      );
+      this.setState({
+        grid: newGrid,
+        isVisualizing: false
+      });
     }
-    var newStartNodeCol = Math.floor(Math.random() * colCount);
-    while (newStartNodeCol === startNodeCol) {
-      newStartNodeCol = Math.floor(Math.random() * colCount);
-    }
-    var newTargetNodeRow = Math.floor(Math.random() * rowCount);
-    while (
-      newTargetNodeRow === targetNodeRow ||
-      newTargetNodeRow === newStartNodeRow
-    ) {
-      newTargetNodeRow = Math.floor(Math.random() * rowCount);
-    }
-    var newTargetNodeCol = Math.floor(Math.random() * colCount);
-    while (
-      newTargetNodeCol === targetNodeCol ||
-      newTargetNodeCol === newStartNodeCol
-    ) {
-      newTargetNodeCol = Math.floor(Math.random() * colCount);
-    }
-    const newGrid = this.initGrid(
-      rowCount,
-      colCount,
-      newStartNodeRow,
-      newStartNodeCol,
-      newTargetNodeRow,
-      newTargetNodeCol
-    );
     ANIMATION_TIMEOUTS = [];
-    this.setState({
-      startNodeRow: newStartNodeRow,
-      startNodeCol: newStartNodeCol,
-      targetNodeRow: newTargetNodeRow,
-      targetNodeCol: newTargetNodeCol,
-      grid: newGrid,
-      isVisualizing: false
-    });
   };
 
   runDijkstra = () => {
