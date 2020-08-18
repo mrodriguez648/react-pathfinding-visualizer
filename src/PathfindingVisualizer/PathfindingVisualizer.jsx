@@ -23,7 +23,8 @@ export default class PathfindingVisualizer extends Component {
       targetNodeCol: props.targetNodeCol,
       shiftKeyMode: false,
       ctrlKeyMode: false,
-      isMouseDown: false,
+      mouseDownMode: false,
+      mouseDownModeSpecialNodeType: null,
       grid: this.initGrid(
         props.rowCount,
         props.colCount,
@@ -34,6 +35,64 @@ export default class PathfindingVisualizer extends Component {
       )
     };
   }
+
+  updateStartNode = (newRow, newCol) => {
+    const {
+      startNodeRow: currStartNodeRow,
+      startNodeCol: currStartNodeCol,
+      grid
+    } = this.state;
+    const currStartNode = grid[currStartNodeRow][currStartNodeCol];
+    const newStartNode = grid[newRow][newCol];
+    const currStartNodeUpdated = React.cloneElement(currStartNode, {
+      isStart: false
+    });
+    grid[currStartNodeRow][currStartNodeCol] = currStartNodeUpdated;
+    const newStartNodeUpdated = React.cloneElement(newStartNode, {
+      isStart: true
+    });
+    grid[newRow][newCol] = newStartNodeUpdated;
+    this.setState({
+      grid: grid,
+      startNodeRow: newRow,
+      startNodeCol: newCol,
+      mouseDownModeSpecialNodeRow: newRow,
+      mouseDownModeSpecialNodeCol: newCol
+    });
+  };
+
+  updateTargetNode = (newRow, newCol) => {
+    const {
+      targetNodeRow: currTargetNodeRow,
+      targetNodeCol: currTargetNodeCol,
+      grid
+    } = this.state;
+    const currTargetNode = grid[currTargetNodeRow][currTargetNodeCol];
+    const newTargetNode = grid[newRow][newCol];
+    const currTargetNodeUpdated = React.cloneElement(currTargetNode, {
+      isTarget: false
+    });
+    grid[currTargetNodeRow][currTargetNodeCol] = currTargetNodeUpdated;
+    const newTargetNodeUpdated = React.cloneElement(newTargetNode, {
+      isTarget: true
+    });
+    grid[newRow][newCol] = newTargetNodeUpdated;
+    this.setState({
+      grid: grid,
+      targetNodeRow: newRow,
+      targetNodeCol: newCol,
+      mouseDownModeSpecialNodeRow: newRow,
+      mouseDownModeSpecialNodeCol: newCol
+    });
+  };
+
+  updateSpecialNode = (newRow, newCol, nodeType) => {
+    if (nodeType === "start") {
+      this.updateStartNode(newRow, newCol);
+    } else {
+      this.updateTargetNode(newRow, newCol);
+    }
+  };
 
   updateWallNode = (row, col, newWallProp) => {
     const newGrid = this.state.grid;
@@ -60,8 +119,25 @@ export default class PathfindingVisualizer extends Component {
     }
   };
 
-  handleOnMouseEnter = (row, col, isWallState) => {
-    if (
+  handleNodeOnMouseDown = specialNodeType => {
+    this.setState({
+      mouseDownMode: true,
+      mouseDownModeSpecialNodeType: specialNodeType
+    });
+  };
+
+  handleNodeOnMouseUp = () => {
+    this.setState({ mouseDownMode: false, mouseDownModeSpecialNodeType: null });
+  };
+
+  handleNodeOnMouseEnter = (row, col, isWallState) => {
+    const {
+      mouseDownMode,
+      mouseDownModeSpecialNodeType: nodeType
+    } = this.state;
+    if (mouseDownMode) {
+      this.updateSpecialNode(row, col, nodeType);
+    } else if (
       (this.state.shiftKeyMode && !isWallState) ||
       (this.state.ctrlKeyMode && isWallState)
     ) {
@@ -100,8 +176,10 @@ export default class PathfindingVisualizer extends Component {
             isShortestPathNode={false}
             isWall={false}
             updateWallNode={this.updateWallNode}
-            onMouseEnter={this.handleOnMouseEnter}
-          ></Node>
+            onMouseEnter={this.handleNodeOnMouseEnter}
+            onMouseDown={this.handleNodeOnMouseDown}
+            onMouseUp={this.handleNodeOnMouseUp}
+          />
         );
         currentRow.push(node);
         nodeCount += 1;
@@ -156,7 +234,14 @@ export default class PathfindingVisualizer extends Component {
       newTargetNodeCol
     );
     ANIMATION_TIMEOUTS = [];
-    this.setState({ startNodeRow: newStartNodeRow, startNodeCol: newStartNodeCol, targetNodeRow: newTargetNodeRow, targetNodeCol: newTargetNodeCol, grid: newGrid, isVisualizing: false });
+    this.setState({
+      startNodeRow: newStartNodeRow,
+      startNodeCol: newStartNodeCol,
+      targetNodeRow: newTargetNodeRow,
+      targetNodeCol: newTargetNodeCol,
+      grid: newGrid,
+      isVisualizing: false
+    });
   };
 
   runDijkstra = () => {
