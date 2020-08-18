@@ -2,7 +2,8 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { Button, AppBar, Toolbar, Typography } from "@material-ui/core";
 import SelectedMenu from "./SelectedMenu";
-import IntroDialog from "./IntroDialog"
+import IntroDialog from "./IntroDialog";
+import RandomizeCheckBox from "./RandomizeCheckbox";
 
 const ALGO_NAMES = ["Dijstrka's", "A* Search", "BFS", "DFS"];
 
@@ -41,10 +42,11 @@ export default function DynamicCSSInterface(props) {
 
   const [selectedAlgo, setSelectedAlgo] = React.useState(ALGO_NAMES[0]);
   const [isVisualizing, setIsVisualizing] = React.useState(false);
+  const [randomizeNodes, setRandomizeNodes] = React.useState(false);
 
   const handleResetGrid = () => {
     setIsVisualizing(false);
-    resetGrid();
+    resetGrid(randomizeNodes);
   };
 
   const handleRunAlgo = () => {
@@ -52,11 +54,15 @@ export default function DynamicCSSInterface(props) {
     runDijkstra();
   };
 
+  const setRandomizeNodesCallback = () => {
+    setRandomizeNodes(!randomizeNodes);
+  }
+
   return (
     <>
-    <div className="intro-dialog">
-      <IntroDialog />
-    </div>
+      <div className="intro-dialog">
+        <IntroDialog />
+      </div>
       <StyledAppBar color={appBarColor} position="static">
         <Toolbar>
           <Typography align="left" variant="h5">
@@ -67,6 +73,7 @@ export default function DynamicCSSInterface(props) {
             Run {selectedAlgo}
           </StyledButton>
           <StyledButton onClick={handleResetGrid}>Reset Grid</StyledButton>
+          <RandomizeCheckBox setRandomizeNodesCallback={setRandomizeNodesCallback} />
         </Toolbar>
       </StyledAppBar>
     </>
