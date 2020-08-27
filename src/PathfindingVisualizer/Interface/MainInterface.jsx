@@ -43,11 +43,11 @@ function DynamicCSSInterface(props) {
   const [selectedAlgo, setSelectedAlgo] = React.useState(ALGO_NAMES[0]);
   const [isVisualizing, setIsVisualizing] = React.useState(false);
   const [randomizeNodes, setRandomizeNodes] = React.useState(false);
-  const [wallReset, setWallReset] = React.useState(false);
+  const [resetWalls, setResetWalls] = React.useState(true);
 
   const handleResetGrid = () => {
     setIsVisualizing(false);
-    resetGrid(randomizeNodes, wallReset);
+    resetGrid(randomizeNodes, resetWalls);
   };
 
   const handleRunAlgo = () => {
@@ -59,8 +59,8 @@ function DynamicCSSInterface(props) {
     setRandomizeNodes(!randomizeNodes);
   };
 
-  const setWallResetCallback = () => {
-    setWallReset(!wallReset);
+  const setResetWallCallback = () => {
+    setResetWalls(!resetWalls);
   };
 
   return (
@@ -82,10 +82,10 @@ function DynamicCSSInterface(props) {
             <div id="interface-checkboxes">
               <CallbackCheckBox
                 checkCallback={setRandomizeNodesCallback}
-                msg="Reset Start/Target node on reset?"
+                msg="Reposition Start/Target node on reset?"
               />
               <CallbackCheckBox
-                checkCallback={setWallResetCallback}
+                checkCallback={setResetWallCallback}
                 msg="Delete all Wall nodes on reset?"
               />
             </div>
