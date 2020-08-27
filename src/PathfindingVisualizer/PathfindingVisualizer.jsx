@@ -3,6 +3,7 @@ import Node from "./Node/Node";
 import { dijkstra } from "../algorithms/dijkstra";
 import { Typography } from "@material-ui/core";
 import Interface from "./Interface/MainInterface";
+import Legend from "./Interface/Legend/Legend";
 import StyledSnackbar from "./Snackbar";
 
 import "./PathfindingVisualizer.css";
@@ -25,13 +26,14 @@ export default class PathfindingVisualizer extends Component {
       ctrlKeyMode: false,
       mouseDownMode: false,
       mouseDownModeSpecialNodeType: null,
+      errorStatus: false,
       grid: this.initGrid(
         props.rowCount,
         props.colCount,
         props.startNodeRow,
         props.startNodeCol,
         props.targetNodeRow,
-        props.targetNodeCol,
+        props.targetNodeCol
       )
     };
   }
@@ -55,9 +57,7 @@ export default class PathfindingVisualizer extends Component {
     this.setState({
       grid: grid,
       startNodeRow: newRow,
-      startNodeCol: newCol,
-      mouseDownModeSpecialNodeRow: newRow,
-      mouseDownModeSpecialNodeCol: newCol
+      startNodeCol: newCol
     });
   };
 
@@ -80,9 +80,7 @@ export default class PathfindingVisualizer extends Component {
     this.setState({
       grid: grid,
       targetNodeRow: newRow,
-      targetNodeCol: newCol,
-      mouseDownModeSpecialNodeRow: newRow,
-      mouseDownModeSpecialNodeCol: newCol
+      targetNodeCol: newCol
     });
   };
 
@@ -141,13 +139,17 @@ export default class PathfindingVisualizer extends Component {
     }
   };
 
+  handleOnMouseLeave = () => {
+    if (this.state.mouseDownMode) this.setState({ mouseDownMode: false });
+  };
+
   initGrid = (
     rowCount,
     colCount,
     startNodeRow,
     startNodeCol,
     targetNodeRow,
-    targetNodeCol,
+    targetNodeCol
   ) => {
     while (targetNodeRow === startNodeRow) {
       targetNodeRow = Math.floor(Math.random() * rowCount);
@@ -174,7 +176,6 @@ export default class PathfindingVisualizer extends Component {
             updateWallNode={this.updateWallNode}
             onMouseEnter={this.handleNodeOnMouseEnter}
             onMouseDown={this.handleNodeOnMouseDown}
-            onMouseUp={this.handleNodeOnMouseUp}
           />
         );
         currentRow.push(node);
@@ -235,7 +236,8 @@ export default class PathfindingVisualizer extends Component {
         startNodeCol: newStartNodeCol,
         targetNodeRow: newTargetNodeRow,
         targetNodeCol: newTargetNodeCol,
-        grid: newGrid,
+        errorStatus: false,
+        grid: newGrid
       });
     } else {
       const newGrid = this.initGrid(
@@ -247,7 +249,8 @@ export default class PathfindingVisualizer extends Component {
         targetNodeCol
       );
       this.setState({
-        grid: newGrid,
+        errorStatus: false,
+        grid: newGrid
       });
     }
     ANIMATION_TIMEOUTS = [];
@@ -266,14 +269,17 @@ export default class PathfindingVisualizer extends Component {
     const visitedGraphNodesInOrder = dijkstra(grid, startNode, targetNode);
     const [targetGraphNode] = visitedGraphNodesInOrder.slice(-1);
     if (targetGraphNode.props.nodeNum !== targetNode.props.nodeNum) {
+      console.log("no path found");
+      this.setState({ errorStatus: true });
+    } else {
+      const shortestPathGraphNodes = this.getNodesInShortestPathOrder(
+        targetGraphNode
+      );
+      ANIMATION_TIMEOUTS = this.animateDijsktra(
+        visitedGraphNodesInOrder,
+        shortestPathGraphNodes
+      );
     }
-    const shortestPathGraphNodes = this.getNodesInShortestPathOrder(
-      targetGraphNode
-    );
-    ANIMATION_TIMEOUTS = this.animateDijsktra(
-      visitedGraphNodesInOrder,
-      shortestPathGraphNodes
-    );
   };
 
   animateDijsktra = (visitedNodesInOrder, shortestPathGraphNodes) => {
@@ -310,8 +316,6 @@ export default class PathfindingVisualizer extends Component {
     return animationTimeouts;
   };
 
-  // Backtracks from the targetNode to find the shortest path.
-  // Only works when called after a graph alg
   getNodesInShortestPathOrder = targetGraphNode => {
     const nodesInShortestPathOrder = [];
     let currentNode = targetGraphNode;
@@ -323,8 +327,7 @@ export default class PathfindingVisualizer extends Component {
   };
 
   render() {
-    const { grid, ctrlKeyMode, shiftKeyMode } = this.state;
-
+    const { grid, ctrlKeyMode, shiftKeyMode, errorStatus } = this.state;
     const colorMode = ctrlKeyMode ? "red" : shiftKeyMode ? "green" : "default";
 
     const snackbarMsg = ctrlKeyMode
@@ -349,12 +352,21 @@ export default class PathfindingVisualizer extends Component {
               runDijkstra={this.runDijkstra}
               resetGrid={this.resetGrid}
               appBarColor={colorMode}
+              errorStatus={errorStatus}
             />
           </div>
-          <div className="grid" onKeyDown={e => this.handleOnKeyDown(e)}>
+          <div className="legend">
+            <Legend />
+          </div>
+          <div
+            className="grid"
+            onKeyDown={e => this.handleOnKeyDown(e)}
+            onMouseLeave={this.handleOnMouseLeave}
+            onMouseUp={this.handleNodeOnMouseUp}
+          >
             {grid.map((row, rowIdx) => {
               return (
-                <div id={`row-${rowIdx}`} key={rowIdx}>
+                <div className="row" id={`row-${rowIdx}`} key={rowIdx}>
                   {row.map(node => {
                     return node;
                   })}

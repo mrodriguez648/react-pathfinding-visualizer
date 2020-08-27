@@ -6,14 +6,7 @@ import MuiDialogContent from "@material-ui/core/DialogContent";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import Typography from "@material-ui/core/Typography";
-
-const MESSAGES = [
-  "This tool simulates pathfinding algorithms within a grid layout.",
-  "Click on any node on the grid to construct a wall that the algorithm cannot pass through to get to the target node.",
-  "Press the shift key to enter wall building mode, where you can mouse over the grid nodes and turn them into wall nodes.",
-  "Press the ctrl key to enter wall deletion mode, where you can mouseover existing wall nodes on the grid to remove them.",
-  "You can reposition the start/target node by clicking and dragging them into empty nodes."
-];
+import Button from "@material-ui/core/Button";
 
 const styles = theme => ({
   root: {
@@ -52,11 +45,14 @@ const DialogContent = withStyles(theme => ({
   }
 }))(MuiDialogContent);
 
-export default function CustomizedDialog() {
-  const [open, setOpen] = React.useState(true);
-
+export default function ErrorDialog(props) {
+  console.log("error dialog called");
+  const { randomizeNodes, resetGrid, openProp } = props;
+  const [open, setOpen] = React.useState(false);
+  if (open !== openProp) setOpen(openProp);
   const handleClose = () => {
     setOpen(false);
+    resetGrid(randomizeNodes);
   };
 
   return (
@@ -67,17 +63,18 @@ export default function CustomizedDialog() {
         open={open}
       >
         <DialogTitle id="customized-dialog-title" onClose={handleClose}>
-          Welcome to Pathfinding Visualizer
+          No path found!
         </DialogTitle>
         <DialogContent dividers>
-          {MESSAGES.map((msg, msgIdx) => {
-            return (
-              <div id={`intro-dialog-msg-${msgIdx}`} key={msg}>
-                <Typography gutterBottom>{msg}</Typography>
-              </div>
-            );
-          })}
+          <div id="dialog-error-msg">
+            <Typography gutterBottom>
+              No path was found to the target node!
+            </Typography>
+          </div>
         </DialogContent>
+        <Button onClick={handleClose} color="primary">
+          Reset Grid
+        </Button>
       </Dialog>
     </div>
   );

@@ -42,7 +42,6 @@ export default class Node extends Component {
         id={`node-${row}-${col}`}
         className={`node ${stylingClassName}`}
         onMouseDown={this.handleOnMouseDown}
-        onMouseUp={this.handleOnMouseUp}
         onMouseEnter={this.handleOnMouseEnter}
         onClick={this.handleOnClick}
         onDragStart={e => {
@@ -60,10 +59,6 @@ export default class Node extends Component {
     } else if (this.props.isTarget) {
       this.props.onMouseDown("target");
     }
-  };
-
-  handleOnMouseUp = () => {
-    this.props.onMouseUp();
   };
 
   handleOnClick = () => {

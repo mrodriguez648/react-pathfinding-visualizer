@@ -1,11 +1,22 @@
-.grid {
-  margin: 10px;
-}
-
 .interface {
   display: flex;
   justify-content: space-between;
   outline: 1px solid black;
+}
+
+.legend > ul li {
+  display: inline-block;
+  padding: 0 25px 0 25px;
+}
+
+.grid {
+  margin: 10px;
+  display: inline-block;
+  outline: 3px solid #3f51b5;
+}
+
+.grid .row {
+  margin: -3px;
 }
 
 .mobile-response {
@@ -13,10 +24,7 @@
   top: 50%;
   left: 50%;
   margin-right: -50%;
-  transform: translate(-50%, -50%)
-}
-
-.mobile-response .mobile-text {
+  transform: translate(-50%, -50%);
   background: black;
   color: white;
 }

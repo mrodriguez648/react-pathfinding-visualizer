@@ -3,9 +3,10 @@ import { withStyles } from "@material-ui/core/styles";
 import { Button, AppBar, Toolbar, Typography } from "@material-ui/core";
 import SelectedMenu from "./SelectedMenu";
 import IntroDialog from "./IntroDialog";
+import ErrorDialog from "./ErrorDialog";
 import RandomizeCheckBox from "./RandomizeCheckbox";
 
-const ALGO_NAMES = ["Dijstrka's", "A* Search", "BFS", "DFS"];
+const ALGO_NAMES = ["Dijstrka's", "A* Search (WIP)", "BFS (WIP)", "DFS (WIP)"];
 
 const StyledButton = withStyles({
   root: {
@@ -37,9 +38,8 @@ const StyledAppBar = withStyles(styles)(({ classes, color, ...other }) => (
   <AppBar className={classes.colorPrimary} {...other} />
 ));
 
-export default function DynamicCSSInterface(props) {
-  const { runDijkstra, resetGrid, appBarColor } = props;
-
+function DynamicCSSInterface(props) {
+  const { runDijkstra, resetGrid, appBarColor, errorStatus } = props;
   const [selectedAlgo, setSelectedAlgo] = React.useState(ALGO_NAMES[0]);
   const [isVisualizing, setIsVisualizing] = React.useState(false);
   const [randomizeNodes, setRandomizeNodes] = React.useState(false);
@@ -78,6 +78,15 @@ export default function DynamicCSSInterface(props) {
           />
         </Toolbar>
       </StyledAppBar>
+      <div className="error-dialog">
+        <ErrorDialog
+          randomizeNodes={randomizeNodes}
+          resetGrid={handleResetGrid}
+          openProp={errorStatus}
+        />
+      </div>
     </>
   );
 }
+
+export default React.memo(DynamicCSSInterface);
