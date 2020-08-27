@@ -12,7 +12,8 @@ const MESSAGES = [
   "Click on any node on the grid to construct a wall that the algorithm cannot pass through to get to the target node.",
   "Press the shift key to enter wall building mode, where you can mouse over the grid nodes and turn them into wall nodes.",
   "Press the ctrl key to enter wall deletion mode, where you can mouseover existing wall nodes on the grid to remove them.",
-  "You can reposition the start/target node by clicking and dragging them into empty nodes."
+  "You can reposition the start/target nodes by clicking and dragging them into empty nodes.",
+  "Mouseover any node type in the legend to learn more about each node."
 ];
 
 const styles = theme => ({

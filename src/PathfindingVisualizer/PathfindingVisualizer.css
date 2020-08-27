@@ -1,7 +1,13 @@
 .interface {
-  display: flex;
-  justify-content: space-between;
-  outline: 1px solid black;
+  outline: 2px solid black;
+}
+
+.interface .interface-appbar #interface-checkboxes {
+  text-align: left;
+}
+
+.legend {
+  margin: 20px 0 20px 0;
 }
 
 .legend > ul li {

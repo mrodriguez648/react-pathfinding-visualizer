@@ -52,11 +52,11 @@ const useStyles = makeStyles({
 });
 
 function StyledCheckbox(props) {
-  const { setRandomizeNodesCallback } = props;
+  const { checkCallback } = props;
   const classes = useStyles();
 
   const handleChange = () => {
-    setRandomizeNodesCallback();
+    checkCallback();
   };
 
   return (
@@ -77,7 +77,7 @@ export default function CustomizedCheckbox(props) {
     <div>
       <FormControlLabel
         control={<StyledCheckbox {...props} />}
-        label="Randomize Start/Target node on reset?"
+        label={props.msg}
       />
     </div>
   );

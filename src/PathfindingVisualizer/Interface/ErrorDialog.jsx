@@ -45,8 +45,7 @@ const DialogContent = withStyles(theme => ({
   }
 }))(MuiDialogContent);
 
-export default function ErrorDialog(props) {
-  console.log("error dialog called");
+function ErrorDialog(props) {
   const { randomizeNodes, resetGrid, openProp } = props;
   const [open, setOpen] = React.useState(false);
   if (open !== openProp) setOpen(openProp);
@@ -79,3 +78,5 @@ export default function ErrorDialog(props) {
     </div>
   );
 }
+
+export default React.memo(ErrorDialog);

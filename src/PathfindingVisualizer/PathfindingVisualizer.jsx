@@ -186,20 +186,22 @@ export default class PathfindingVisualizer extends Component {
     return grid;
   };
 
-  resetGrid = randomizeNodes => {
+  resetGrid = (randomizeSpecialNodes, resetWalls) => {
     const {
       rowCount,
       colCount,
       startNodeRow,
       startNodeCol,
       targetNodeRow,
-      targetNodeCol
+      targetNodeCol,
+      grid
     } = this.state;
     // clear in progress and queued animations
     for (let i = 0; i < ANIMATION_TIMEOUTS.length; i++) {
       clearTimeout(ANIMATION_TIMEOUTS[i]);
     }
-    if (randomizeNodes) {
+
+    if (randomizeSpecialNodes) {
       // randomize start and target node positions
       var newStartNodeRow = Math.floor(Math.random() * rowCount);
       while (newStartNodeRow === startNodeRow) {
@@ -223,7 +225,7 @@ export default class PathfindingVisualizer extends Component {
       ) {
         newTargetNodeCol = Math.floor(Math.random() * colCount);
       }
-      const newGrid = this.initGrid(
+      const freshGrid = this.initGrid(
         rowCount,
         colCount,
         newStartNodeRow,
@@ -231,16 +233,30 @@ export default class PathfindingVisualizer extends Component {
         newTargetNodeRow,
         newTargetNodeCol
       );
+
+      if (!resetWalls) {
+        for (let row = 0; row < rowCount; row++) {
+          for (let col = 0; col < colCount; col++) {
+            const oldNode = grid[row][col];
+            if (oldNode.props.isWall) {
+              const freshNode = freshGrid[row][col];
+              const updatedNode = React.cloneElement(freshNode, {isWall: true });
+              freshGrid[row][col] = updatedNode;
+            }
+          }
+        }
+      }
+
       this.setState({
         startNodeRow: newStartNodeRow,
         startNodeCol: newStartNodeCol,
         targetNodeRow: newTargetNodeRow,
         targetNodeCol: newTargetNodeCol,
         errorStatus: false,
-        grid: newGrid
+        grid: freshGrid
       });
     } else {
-      const newGrid = this.initGrid(
+      const freshGrid = this.initGrid(
         rowCount,
         colCount,
         startNodeRow,
@@ -248,9 +264,21 @@ export default class PathfindingVisualizer extends Component {
         targetNodeRow,
         targetNodeCol
       );
+      if (!resetWalls) {
+        for (let row = 0; row < rowCount; row++) {
+          for (let col = 0; col < colCount; col++) {
+            const oldNode = grid[row][col];
+            if (oldNode.props.isWall) {
+              const freshNode = freshGrid[row][col];
+              const updatedNode = React.cloneElement(freshNode, {isWall: true });
+              freshGrid[row][col] = updatedNode;
+            }
+          }
+        }
+      }
       this.setState({
         errorStatus: false,
-        grid: newGrid
+        grid: freshGrid
       });
     }
     ANIMATION_TIMEOUTS = [];

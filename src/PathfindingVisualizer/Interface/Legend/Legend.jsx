@@ -1,5 +1,6 @@
 import React from "react";
 import NodePopover from "./Popover";
+import { Typography } from "@material-ui/core";
 
 const NODE_MSGS = [
   "Empty node that the algorithm can traverse through. You can place start/target/wall nodes within it.",
@@ -12,52 +13,55 @@ const NODE_MSGS = [
 
 function LegendWithPopovers() {
   return (
-    <ul>
-      <li>
-        <p>Vacant Node</p>
-        <NodePopover msg={NODE_MSGS[0]} transformOriginHorizontal="left" />
-      </li>
-      <li>
-        <p>Start Node</p>
-        <NodePopover
-          nodeType="node-start"
-          msg={NODE_MSGS[1]}
-          transformOriginHorizontal="left"
-        />
-      </li>
-      <li>
-        <p>Target Node</p>
-        <NodePopover
-          nodeType="node-target"
-          msg={NODE_MSGS[2]}
-          transformOriginHorizontal="left"
-        />
-      </li>
-      <li>
-        <p>Wall Node</p>
-        <NodePopover
-          nodeType="node-wall"
-          msg={NODE_MSGS[3]}
-          transformOriginHorizontal="right"
-        />
-      </li>
-      <li>
-        <p>Visited Node</p>
-        <NodePopover
-          nodeType="node-graph"
-          msg={NODE_MSGS[4]}
-          transformOriginHorizontal="right"
-        />
-      </li>
-      <li>
-        <p>Shortest Path Node</p>
-        <NodePopover
-          nodeType="node-shortest-path"
-          msg={NODE_MSGS[5]}
-          transformOriginHorizontal="right"
-        />
-      </li>
-    </ul>
+    <>
+      <Typography variant="h5">Node Types</Typography>
+      <ul>
+        <li>
+          <h4>Vacant</h4>
+          <NodePopover msg={NODE_MSGS[0]} transformOriginHorizontal="left" />
+        </li>
+        <li>
+          <h4>Start</h4>
+          <NodePopover
+            nodeType="node-start"
+            msg={NODE_MSGS[1]}
+            transformOriginHorizontal="left"
+          />
+        </li>
+        <li>
+          <h4>Target</h4>
+          <NodePopover
+            nodeType="node-target"
+            msg={NODE_MSGS[2]}
+            transformOriginHorizontal="left"
+          />
+        </li>
+        <li>
+          <h4>Wall</h4>
+          <NodePopover
+            nodeType="node-wall"
+            msg={NODE_MSGS[3]}
+            transformOriginHorizontal="right"
+          />
+        </li>
+        <li>
+          <h4>Visited</h4>
+          <NodePopover
+            nodeType="node-graph"
+            msg={NODE_MSGS[4]}
+            transformOriginHorizontal="right"
+          />
+        </li>
+        <li>
+          <h4>Shortest Path</h4>
+          <NodePopover
+            nodeType="node-shortest-path"
+            msg={NODE_MSGS[5]}
+            transformOriginHorizontal="right"
+          />
+        </li>
+      </ul>
+    </>
   );
 }
 

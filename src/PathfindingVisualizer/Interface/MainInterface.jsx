@@ -4,7 +4,7 @@ import { Button, AppBar, Toolbar, Typography } from "@material-ui/core";
 import SelectedMenu from "./SelectedMenu";
 import IntroDialog from "./IntroDialog";
 import ErrorDialog from "./ErrorDialog";
-import RandomizeCheckBox from "./RandomizeCheckbox";
+import CallbackCheckBox from "./RandomizeCheckbox";
 
 const ALGO_NAMES = ["Dijstrka's", "A* Search (WIP)", "BFS (WIP)", "DFS (WIP)"];
 
@@ -43,10 +43,11 @@ function DynamicCSSInterface(props) {
   const [selectedAlgo, setSelectedAlgo] = React.useState(ALGO_NAMES[0]);
   const [isVisualizing, setIsVisualizing] = React.useState(false);
   const [randomizeNodes, setRandomizeNodes] = React.useState(false);
+  const [wallReset, setWallReset] = React.useState(false);
 
   const handleResetGrid = () => {
     setIsVisualizing(false);
-    resetGrid(randomizeNodes);
+    resetGrid(randomizeNodes, wallReset);
   };
 
   const handleRunAlgo = () => {
@@ -58,26 +59,39 @@ function DynamicCSSInterface(props) {
     setRandomizeNodes(!randomizeNodes);
   };
 
+  const setWallResetCallback = () => {
+    setWallReset(!wallReset);
+  };
+
   return (
     <>
-      <div className="intro-dialog">
+      <div id="intro-dialog">
         <IntroDialog />
       </div>
-      <StyledAppBar color={appBarColor} position="static">
-        <Toolbar>
-          <Typography align="left" variant="h5">
-            Pathfinding Visualizer
-          </Typography>
-          <SelectedMenu options={ALGO_NAMES} changeAlgo={setSelectedAlgo} />
-          <StyledButton onClick={handleRunAlgo} disabled={isVisualizing}>
-            Run {selectedAlgo}
-          </StyledButton>
-          <StyledButton onClick={handleResetGrid}>Reset Grid</StyledButton>
-          <RandomizeCheckBox
-            setRandomizeNodesCallback={setRandomizeNodesCallback}
-          />
-        </Toolbar>
-      </StyledAppBar>
+      <div className="interface-appbar">
+        <StyledAppBar color={appBarColor} position="static">
+          <Toolbar>
+            <Typography align="left" variant="h5">
+              Pathfinding Visualizer
+            </Typography>
+            <SelectedMenu options={ALGO_NAMES} changeAlgo={setSelectedAlgo} />
+            <StyledButton onClick={handleRunAlgo} disabled={isVisualizing}>
+              Run {selectedAlgo}
+            </StyledButton>
+            <StyledButton onClick={handleResetGrid}>Reset Grid</StyledButton>
+            <div id="interface-checkboxes">
+              <CallbackCheckBox
+                checkCallback={setRandomizeNodesCallback}
+                msg="Reset Start/Target node on reset?"
+              />
+              <CallbackCheckBox
+                checkCallback={setWallResetCallback}
+                msg="Delete all Wall nodes on reset?"
+              />
+            </div>
+          </Toolbar>
+        </StyledAppBar>
+      </div>
       <div className="error-dialog">
         <ErrorDialog
           randomizeNodes={randomizeNodes}
