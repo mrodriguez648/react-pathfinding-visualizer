@@ -19,7 +19,7 @@ const useStyles = makeStyles(
 );
 
 export default function SimpleListMenu(props) {
-  const { changeAlgo, options } = props;
+  const { setAlgoCallback, options, setPathfinderAlgoIdxCallback } = props;
   const classes = useStyles();
   const [anchorElement, setAnchorElement] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
@@ -31,7 +31,8 @@ export default function SimpleListMenu(props) {
   const handleMenuItemClick = (event, index) => {
     setSelectedIndex(index);
     setAnchorElement(null);
-    changeAlgo(options[index]);
+    setAlgoCallback(options[index]);
+    setPathfinderAlgoIdxCallback(index);
   };
 
   const handleClose = () => {
@@ -68,7 +69,7 @@ export default function SimpleListMenu(props) {
             key={option}
             selected={index === selectedIndex}
             onClick={event => handleMenuItemClick(event, index)}
-            disabled={option !== options[0]}
+            disabled={index > 0}
           >
             {option}
           </MenuItem>

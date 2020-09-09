@@ -6,7 +6,6 @@ import MuiDialogContent from "@material-ui/core/DialogContent";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
 
 const styles = theme => ({
   root: {
@@ -45,39 +44,26 @@ const DialogContent = withStyles(theme => ({
   }
 }))(MuiDialogContent);
 
-function ErrorDialog(props) {
-  const { randomizeNodes, keepWalls, resetGridCallback, openProp } = props;
-  const [open, setOpen] = React.useState(false);
-  if (open !== openProp) setOpen(openProp);
-
-  const handleResetClose = () => {
-    setOpen(false);
-    resetGridCallback(randomizeNodes, keepWalls);
-  };
+export default function AlgoInfoDialog(props) {
+  const { openProp, algoIdx, algoInfo, openAlgoInfoDialogCallback } = props;
 
   return (
     <div>
       <Dialog
-        onClose={handleResetClose}
+        onClose={openAlgoInfoDialogCallback}
         aria-labelledby="customized-dialog-title"
-        open={open}
+        open={openProp}
       >
-        <DialogTitle id="customized-dialog-title" onClose={handleResetClose}>
-          No path found!
+        <DialogTitle
+          id="customized-dialog-title"
+          onClose={openAlgoInfoDialogCallback}
+        >
+          {`${algoInfo[algoIdx][0]} by ${algoInfo[algoIdx][1]}`}
         </DialogTitle>
         <DialogContent dividers>
-          <div id="dialog-error-msg">
-            <Typography gutterBottom>
-              No path was found to the target node!
-            </Typography>
-          </div>
+          <Typography>{algoInfo[algoIdx][3]}</Typography>
         </DialogContent>
-        <Button onClick={handleResetClose} color="primary">
-          Reset Grid
-        </Button>
       </Dialog>
     </div>
   );
 }
-
-export default React.memo(ErrorDialog);

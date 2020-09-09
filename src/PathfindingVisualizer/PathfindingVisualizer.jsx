@@ -5,10 +5,14 @@ import { Typography } from "@material-ui/core";
 import Interface from "./Interface/MainInterface";
 import Legend from "./Interface/Legend/Legend";
 import StyledSnackbar from "./Snackbar";
+import KeyDownListener from "./KeyDownListener";
+import AlgoInfo from "./Interface/AlgoInfo/AlgoInfo";
 
 import "./PathfindingVisualizer.css";
 
 const isMobile = window.innerWidth <= 800;
+
+const ALGO_NAMES = ["Dijstrka's", "A* Search (WIP)", "BFS (WIP)", "DFS (WIP)"];
 
 let ANIMATION_TIMEOUTS = [];
 
@@ -27,6 +31,7 @@ export default class PathfindingVisualizer extends Component {
       mouseDownMode: false,
       mouseDownModeSpecialNodeType: null,
       errorStatus: false,
+      currentAlgoIdx: 0,
       grid: this.initGrid(
         props.rowCount,
         props.colCount,
@@ -37,60 +42,6 @@ export default class PathfindingVisualizer extends Component {
       )
     };
   }
-
-  updateStartNode = (newRow, newCol) => {
-    const {
-      startNodeRow: currStartNodeRow,
-      startNodeCol: currStartNodeCol,
-      grid
-    } = this.state;
-    const currStartNode = grid[currStartNodeRow][currStartNodeCol];
-    const newStartNode = grid[newRow][newCol];
-    const currStartNodeUpdated = React.cloneElement(currStartNode, {
-      isStart: false
-    });
-    grid[currStartNodeRow][currStartNodeCol] = currStartNodeUpdated;
-    const newStartNodeUpdated = React.cloneElement(newStartNode, {
-      isStart: true
-    });
-    grid[newRow][newCol] = newStartNodeUpdated;
-    this.setState({
-      grid: grid,
-      startNodeRow: newRow,
-      startNodeCol: newCol
-    });
-  };
-
-  updateTargetNode = (newRow, newCol) => {
-    const {
-      targetNodeRow: currTargetNodeRow,
-      targetNodeCol: currTargetNodeCol,
-      grid
-    } = this.state;
-    const currTargetNode = grid[currTargetNodeRow][currTargetNodeCol];
-    const newTargetNode = grid[newRow][newCol];
-    const currTargetNodeUpdated = React.cloneElement(currTargetNode, {
-      isTarget: false
-    });
-    grid[currTargetNodeRow][currTargetNodeCol] = currTargetNodeUpdated;
-    const newTargetNodeUpdated = React.cloneElement(newTargetNode, {
-      isTarget: true
-    });
-    grid[newRow][newCol] = newTargetNodeUpdated;
-    this.setState({
-      grid: grid,
-      targetNodeRow: newRow,
-      targetNodeCol: newCol
-    });
-  };
-
-  updateWallNode = (row, col, newWallProp) => {
-    const newGrid = this.state.grid;
-    const oldNode = newGrid[row][col];
-    const updatedNode = React.cloneElement(oldNode, { isWall: newWallProp });
-    newGrid[row][col] = updatedNode;
-    this.setState({ grid: newGrid });
-  };
 
   handleOnKeyDown = e => {
     if (e.repeat) {
@@ -106,6 +57,8 @@ export default class PathfindingVisualizer extends Component {
         ctrlKeyMode: !this.state.ctrlKeyMode,
         shiftKeyMode: false
       });
+    } else {
+      return;
     }
   };
 
@@ -151,10 +104,8 @@ export default class PathfindingVisualizer extends Component {
     targetNodeRow,
     targetNodeCol
   ) => {
-    while (targetNodeRow === startNodeRow) {
+    while (targetNodeRow === startNodeRow && targetNodeCol === startNodeCol) {
       targetNodeRow = Math.floor(Math.random() * rowCount);
-    }
-    while (targetNodeCol === startNodeCol) {
       targetNodeCol = Math.floor(Math.random() * colCount);
     }
     const grid = [];
@@ -186,7 +137,7 @@ export default class PathfindingVisualizer extends Component {
     return grid;
   };
 
-  resetGrid = (randomizeSpecialNodes, resetWalls) => {
+  resetGrid = (randomizeSpecialNodes, keepWalls) => {
     const {
       rowCount,
       colCount,
@@ -212,17 +163,18 @@ export default class PathfindingVisualizer extends Component {
         newStartNodeCol = Math.floor(Math.random() * colCount);
       }
       var newTargetNodeRow = Math.floor(Math.random() * rowCount);
-      while (
-        newTargetNodeRow === targetNodeRow ||
-        newTargetNodeRow === newStartNodeRow
-      ) {
+      while (newTargetNodeRow === targetNodeRow) {
         newTargetNodeRow = Math.floor(Math.random() * rowCount);
       }
       var newTargetNodeCol = Math.floor(Math.random() * colCount);
+      while (newTargetNodeCol === targetNodeCol) {
+        newTargetNodeCol = Math.floor(Math.random() * colCount);
+      }
       while (
-        newTargetNodeCol === targetNodeCol ||
+        newTargetNodeRow === newStartNodeRow &&
         newTargetNodeCol === newStartNodeCol
       ) {
+        newTargetNodeRow = Math.floor(Math.random() * rowCount);
         newTargetNodeCol = Math.floor(Math.random() * colCount);
       }
       const freshGrid = this.initGrid(
@@ -234,13 +186,15 @@ export default class PathfindingVisualizer extends Component {
         newTargetNodeCol
       );
 
-      if (!resetWalls) {
+      if (keepWalls) {
         for (let row = 0; row < rowCount; row++) {
           for (let col = 0; col < colCount; col++) {
             const oldNode = grid[row][col];
             if (oldNode.props.isWall) {
               const freshNode = freshGrid[row][col];
-              const updatedNode = React.cloneElement(freshNode, {isWall: true });
+              const updatedNode = React.cloneElement(freshNode, {
+                isWall: true
+              });
               freshGrid[row][col] = updatedNode;
             }
           }
@@ -264,13 +218,15 @@ export default class PathfindingVisualizer extends Component {
         targetNodeRow,
         targetNodeCol
       );
-      if (!resetWalls) {
+      if (keepWalls) {
         for (let row = 0; row < rowCount; row++) {
           for (let col = 0; col < colCount; col++) {
             const oldNode = grid[row][col];
             if (oldNode.props.isWall) {
               const freshNode = freshGrid[row][col];
-              const updatedNode = React.cloneElement(freshNode, {isWall: true });
+              const updatedNode = React.cloneElement(freshNode, {
+                isWall: true
+              });
               freshGrid[row][col] = updatedNode;
             }
           }
@@ -354,8 +310,72 @@ export default class PathfindingVisualizer extends Component {
     return nodesInShortestPathOrder;
   };
 
+  updateStartNode = (newRow, newCol) => {
+    const {
+      startNodeRow: currStartNodeRow,
+      startNodeCol: currStartNodeCol,
+      grid
+    } = this.state;
+    const currStartNode = grid[currStartNodeRow][currStartNodeCol];
+    const newStartNode = grid[newRow][newCol];
+    const currStartNodeUpdated = React.cloneElement(currStartNode, {
+      isStart: false
+    });
+    grid[currStartNodeRow][currStartNodeCol] = currStartNodeUpdated;
+    const newStartNodeUpdated = React.cloneElement(newStartNode, {
+      isStart: true
+    });
+    grid[newRow][newCol] = newStartNodeUpdated;
+    this.setState({
+      grid: grid,
+      startNodeRow: newRow,
+      startNodeCol: newCol
+    });
+  };
+
+  updateTargetNode = (newRow, newCol) => {
+    const {
+      targetNodeRow: currTargetNodeRow,
+      targetNodeCol: currTargetNodeCol,
+      grid
+    } = this.state;
+    const currTargetNode = grid[currTargetNodeRow][currTargetNodeCol];
+    const newTargetNode = grid[newRow][newCol];
+    const currTargetNodeUpdated = React.cloneElement(currTargetNode, {
+      isTarget: false
+    });
+    grid[currTargetNodeRow][currTargetNodeCol] = currTargetNodeUpdated;
+    const newTargetNodeUpdated = React.cloneElement(newTargetNode, {
+      isTarget: true
+    });
+    grid[newRow][newCol] = newTargetNodeUpdated;
+    this.setState({
+      grid: grid,
+      targetNodeRow: newRow,
+      targetNodeCol: newCol
+    });
+  };
+
+  updateWallNode = (row, col, newWallProp) => {
+    const newGrid = this.state.grid;
+    const oldNode = newGrid[row][col];
+    const updatedNode = React.cloneElement(oldNode, { isWall: newWallProp });
+    newGrid[row][col] = updatedNode;
+    this.setState({ grid: newGrid });
+  };
+
+  setAlgoIdx = index => {
+    this.setState({ currentAlgoIdx: index });
+  };
+
   render() {
-    const { grid, ctrlKeyMode, shiftKeyMode, errorStatus } = this.state;
+    const {
+      grid,
+      ctrlKeyMode,
+      shiftKeyMode,
+      errorStatus,
+      currentAlgoIdx
+    } = this.state;
     const colorMode = ctrlKeyMode ? "red" : shiftKeyMode ? "green" : "default";
 
     const snackbarMsg = ctrlKeyMode
@@ -375,32 +395,39 @@ export default class PathfindingVisualizer extends Component {
     } else {
       return (
         <>
+          <KeyDownListener onKeyDown={this.handleOnKeyDown} />
           <div className="interface">
             <Interface
-              runDijkstra={this.runDijkstra}
-              resetGrid={this.resetGrid}
+              runDijkstraCallback={this.runDijkstra}
+              resetGridCallback={this.resetGrid}
+              setAlgoIdxCallback={this.setAlgoIdx}
               appBarColor={colorMode}
               errorStatus={errorStatus}
+              algoNames={ALGO_NAMES}
             />
           </div>
           <div className="legend">
             <Legend />
           </div>
-          <div
-            className="grid"
-            onKeyDown={e => this.handleOnKeyDown(e)}
-            onMouseLeave={this.handleOnMouseLeave}
-            onMouseUp={this.handleNodeOnMouseUp}
-          >
-            {grid.map((row, rowIdx) => {
-              return (
-                <div className="row" id={`row-${rowIdx}`} key={rowIdx}>
-                  {row.map(node => {
-                    return node;
-                  })}
-                </div>
-              );
-            })}
+          <div className="grid-content">
+            <div
+              className="grid"
+              onMouseLeave={this.handleOnMouseLeave}
+              onMouseUp={this.handleNodeOnMouseUp}
+            >
+              {grid.map((row, rowIdx) => {
+                return (
+                  <div className="row" id={`row-${rowIdx}`} key={rowIdx}>
+                    {row.map(node => {
+                      return node;
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="algo-info">
+              <AlgoInfo algoIdx={currentAlgoIdx} />
+            </div>
           </div>
           <div className="snackbar">
             <StyledSnackbar

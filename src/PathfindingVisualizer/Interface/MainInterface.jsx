@@ -6,8 +6,6 @@ import IntroDialog from "./IntroDialog";
 import ErrorDialog from "./ErrorDialog";
 import CallbackCheckBox from "./RandomizeCheckbox";
 
-const ALGO_NAMES = ["Dijstrka's", "A* Search (WIP)", "BFS (WIP)", "DFS (WIP)"];
-
 const StyledButton = withStyles({
   root: {
     outline: "2px solid white",
@@ -16,10 +14,8 @@ const StyledButton = withStyles({
     color: "white",
     height: 48,
     padding: "0 30px",
-    margin: "0 25px",
-    "&$disabled": { color: "red" }
-  },
-  disabled: {}
+    margin: "0 25px"
+  }
 })(Button);
 
 const styledBy = (property, mapping) => props => mapping[props[property]];
@@ -39,28 +35,35 @@ const StyledAppBar = withStyles(styles)(({ classes, color, ...other }) => (
 ));
 
 function DynamicCSSInterface(props) {
-  const { runDijkstra, resetGrid, appBarColor, errorStatus } = props;
-  const [selectedAlgo, setSelectedAlgo] = React.useState(ALGO_NAMES[0]);
+  const {
+    runDijkstraCallback,
+    resetGridCallback,
+    setAlgoIdxCallback,
+    appBarColor,
+    errorStatus,
+    algoNames
+  } = props;
+  const [selectedAlgo, setSelectedAlgo] = React.useState(algoNames[0]);
   const [isVisualizing, setIsVisualizing] = React.useState(false);
   const [randomizeNodes, setRandomizeNodes] = React.useState(false);
-  const [resetWalls, setResetWalls] = React.useState(true);
+  const [keepWalls, setKeepWalls] = React.useState(false);
 
   const handleResetGrid = () => {
     setIsVisualizing(false);
-    resetGrid(randomizeNodes, resetWalls);
+    resetGridCallback(randomizeNodes, keepWalls);
   };
 
   const handleRunAlgo = () => {
     setIsVisualizing(true);
-    runDijkstra();
+    runDijkstraCallback();
   };
 
   const setRandomizeNodesCallback = () => {
     setRandomizeNodes(!randomizeNodes);
   };
 
-  const setResetWallCallback = () => {
-    setResetWalls(!resetWalls);
+  const setKeepWallsCallback = () => {
+    setKeepWalls(!keepWalls);
   };
 
   return (
@@ -74,10 +77,16 @@ function DynamicCSSInterface(props) {
             <Typography align="left" variant="h5">
               Pathfinding Visualizer
             </Typography>
-            <SelectedMenu options={ALGO_NAMES} changeAlgo={setSelectedAlgo} />
-            <StyledButton onClick={handleRunAlgo} disabled={isVisualizing}>
-              Run {selectedAlgo}
-            </StyledButton>
+            <SelectedMenu
+              options={algoNames}
+              setAlgoCallback={setSelectedAlgo}
+              setPathfinderAlgoIdxCallback={setAlgoIdxCallback}
+            />
+            {!isVisualizing && (
+              <StyledButton onClick={handleRunAlgo}>
+                Run {selectedAlgo}
+              </StyledButton>
+            )}
             <StyledButton onClick={handleResetGrid}>Reset Grid</StyledButton>
             <div id="interface-checkboxes">
               <CallbackCheckBox
@@ -85,8 +94,8 @@ function DynamicCSSInterface(props) {
                 msg="Reposition Start/Target node on reset?"
               />
               <CallbackCheckBox
-                checkCallback={setResetWallCallback}
-                msg="Delete all Wall nodes on reset?"
+                checkCallback={setKeepWallsCallback}
+                msg="Keep all Wall nodes on reset?"
               />
             </div>
           </Toolbar>
@@ -95,7 +104,8 @@ function DynamicCSSInterface(props) {
       <div className="error-dialog">
         <ErrorDialog
           randomizeNodes={randomizeNodes}
-          resetGrid={handleResetGrid}
+          resetWalls={keepWalls}
+          resetGridCallback={handleResetGrid}
           openProp={errorStatus}
         />
       </div>
