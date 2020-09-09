@@ -102,13 +102,29 @@ export default class PathfindingVisualizer extends Component {
     startNodeRow,
     startNodeCol,
     targetNodeRow,
-    targetNodeCol
+    targetNodeCol,
+    keepWalls,
+    oldGrid
   ) => {
     while (targetNodeRow === startNodeRow && targetNodeCol === startNodeCol) {
       targetNodeRow = Math.floor(Math.random() * rowCount);
       targetNodeCol = Math.floor(Math.random() * colCount);
     }
     const grid = [];
+    if (keepWalls) {
+      for (let row = 0; row < rowCount; row++) {
+        for (let col = 0; col < colCount; col++) {
+          const oldNode = grid[row][col];
+          if (oldNode.props.isWall) {
+            const freshNode = updatedGrid[row][col];
+            const updatedNode = React.cloneElement(freshNode, {
+              isWall: true
+            });
+            updatedGrid[row][col] = updatedNode;
+          }
+        }
+      }
+    }
     let nodeCount = 0;
     for (let row = 0; row < rowCount; row++) {
       const currentRow = [];
@@ -152,6 +168,8 @@ export default class PathfindingVisualizer extends Component {
       clearTimeout(ANIMATION_TIMEOUTS[i]);
     }
 
+    const updatedGrid = grid.slice();
+
     if (randomizeSpecialNodes) {
       // randomize start and target node positions
       var newStartNodeRow = Math.floor(Math.random() * rowCount);
@@ -159,7 +177,10 @@ export default class PathfindingVisualizer extends Component {
         newStartNodeRow = Math.floor(Math.random() * rowCount);
       }
       var newStartNodeCol = Math.floor(Math.random() * colCount);
-      while (newStartNodeCol === startNodeCol) {
+      while (
+        newStartNodeCol === startNodeCol &&
+        grid[newStartNodeRow][newStartNodecol].props.isWall
+      ) {
         newStartNodeCol = Math.floor(Math.random() * colCount);
       }
       var newTargetNodeRow = Math.floor(Math.random() * rowCount);
@@ -167,7 +188,10 @@ export default class PathfindingVisualizer extends Component {
         newTargetNodeRow = Math.floor(Math.random() * rowCount);
       }
       var newTargetNodeCol = Math.floor(Math.random() * colCount);
-      while (newTargetNodeCol === targetNodeCol) {
+      while (
+        newTargetNodeCol === targetNodeCol &&
+        grid[newTargetNodeRow][newTargetNodeCol].props.isWall
+      ) {
         newTargetNodeCol = Math.floor(Math.random() * colCount);
       }
       while (
@@ -177,29 +201,8 @@ export default class PathfindingVisualizer extends Component {
         newTargetNodeRow = Math.floor(Math.random() * rowCount);
         newTargetNodeCol = Math.floor(Math.random() * colCount);
       }
-      const freshGrid = this.initGrid(
-        rowCount,
-        colCount,
-        newStartNodeRow,
-        newStartNodeCol,
-        newTargetNodeRow,
-        newTargetNodeCol
-      );
 
-      if (keepWalls) {
-        for (let row = 0; row < rowCount; row++) {
-          for (let col = 0; col < colCount; col++) {
-            const oldNode = grid[row][col];
-            if (oldNode.props.isWall) {
-              const freshNode = freshGrid[row][col];
-              const updatedNode = React.cloneElement(freshNode, {
-                isWall: true
-              });
-              freshGrid[row][col] = updatedNode;
-            }
-          }
-        }
-      }
+      
 
       this.setState({
         startNodeRow: newStartNodeRow,
@@ -207,7 +210,7 @@ export default class PathfindingVisualizer extends Component {
         targetNodeRow: newTargetNodeRow,
         targetNodeCol: newTargetNodeCol,
         errorStatus: false,
-        grid: freshGrid
+        grid: updatedGrid
       });
     } else {
       const freshGrid = this.initGrid(
@@ -216,22 +219,10 @@ export default class PathfindingVisualizer extends Component {
         startNodeRow,
         startNodeCol,
         targetNodeRow,
-        targetNodeCol
+        targetNodeCol,
+        false,
+        null
       );
-      if (keepWalls) {
-        for (let row = 0; row < rowCount; row++) {
-          for (let col = 0; col < colCount; col++) {
-            const oldNode = grid[row][col];
-            if (oldNode.props.isWall) {
-              const freshNode = freshGrid[row][col];
-              const updatedNode = React.cloneElement(freshNode, {
-                isWall: true
-              });
-              freshGrid[row][col] = updatedNode;
-            }
-          }
-        }
-      }
       this.setState({
         errorStatus: false,
         grid: freshGrid
