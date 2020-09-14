@@ -116,11 +116,11 @@ export default class PathfindingVisualizer extends Component {
         for (let col = 0; col < colCount; col++) {
           const oldNode = grid[row][col];
           if (oldNode.props.isWall) {
-            const freshNode = updatedGrid[row][col];
+            const freshNode = oldGrid[row][col];
             const updatedNode = React.cloneElement(freshNode, {
               isWall: true
             });
-            updatedGrid[row][col] = updatedNode;
+            oldGrid[row][col] = updatedNode;
           }
         }
       }
@@ -179,7 +179,7 @@ export default class PathfindingVisualizer extends Component {
       var newStartNodeCol = Math.floor(Math.random() * colCount);
       while (
         newStartNodeCol === startNodeCol &&
-        grid[newStartNodeRow][newStartNodecol].props.isWall
+        grid[newStartNodeRow][newStartNodeCol].props.isWall
       ) {
         newStartNodeCol = Math.floor(Math.random() * colCount);
       }
