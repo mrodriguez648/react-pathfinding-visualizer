@@ -1,7 +1,7 @@
 export function dijkstra(grid, startNode, targetNode) {
-  const visitedNodesInOrder = [];
-  const graphNodes = initGraphNodes(grid);
-  const unvisitedGraphNodes = graphNodes.slice();
+  let visitedNodesInOrder = [];
+  let graphNodes = initGraphNodes(grid);
+  let unvisitedGraphNodes = graphNodes.slice();
   unvisitedGraphNodes[startNode.props.nodeNum].distance = 0;
   while (!!unvisitedGraphNodes.length) {
     sortNodesByDistance(unvisitedGraphNodes);

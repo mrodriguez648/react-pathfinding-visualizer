@@ -36,7 +36,7 @@ const StyledAppBar = withStyles(styles)(({ classes, color, ...other }) => (
 
 function DynamicCSSInterface(props) {
   const {
-    runDijkstraCallback,
+    runAlgoCallback,
     resetGridCallback,
     setAlgoIdxCallback,
     appBarColor,
@@ -55,7 +55,7 @@ function DynamicCSSInterface(props) {
 
   const handleRunAlgo = () => {
     setIsVisualizing(true);
-    runDijkstraCallback();
+    runAlgoCallback(selectedAlgo);
   };
 
   const setRandomizeNodesCallback = () => {

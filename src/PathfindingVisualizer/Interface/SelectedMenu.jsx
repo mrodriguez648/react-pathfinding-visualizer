@@ -69,7 +69,7 @@ export default function SimpleListMenu(props) {
             key={option}
             selected={index === selectedIndex}
             onClick={event => handleMenuItemClick(event, index)}
-            disabled={index > 0}
+            disabled={index > 1}
           >
             {option}
           </MenuItem>

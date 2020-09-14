@@ -22,7 +22,7 @@ export default function CustomizedSnackbars(props) {
   const classes = useStyles();
   if (openProp !== open) setOpen(openProp);
 
-  const handleClose = (reason) => {
+  const handleClose = reason => {
     if (reason === "clickaway") {
       return;
     }

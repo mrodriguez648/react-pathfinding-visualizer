@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Node from "./Node/Node";
 import { dijkstra } from "../algorithms/dijkstra";
+import { bfs_dfs } from "../algorithms/bfs_dfs";
 import { Typography } from "@material-ui/core";
 import Interface from "./Interface/MainInterface";
 import Legend from "./Interface/Legend/Legend";
@@ -12,7 +13,7 @@ import "./PathfindingVisualizer.css";
 
 const isMobile = window.innerWidth <= 800;
 
-const ALGO_NAMES = ["Dijstrka's", "A* Search (WIP)", "BFS (WIP)", "DFS (WIP)"];
+const ALGO_NAMES = ["Dijstrka's", "BFS", "A* Search (WIP)", "DFS (WIP)"];
 
 let ANIMATION_TIMEOUTS = [];
 
@@ -240,7 +241,7 @@ export default class PathfindingVisualizer extends Component {
     ANIMATION_TIMEOUTS = [];
   };
 
-  runDijkstra = () => {
+  runAlgo = selectedAlgo => {
     const {
       startNodeRow,
       startNodeCol,
@@ -250,7 +251,12 @@ export default class PathfindingVisualizer extends Component {
     } = this.state;
     const startNode = grid[startNodeRow][startNodeCol];
     const targetNode = grid[targetNodeRow][targetNodeCol];
-    const visitedGraphNodesInOrder = dijkstra(grid, startNode, targetNode);
+    let visitedGraphNodesInOrder = [];
+    if (selectedAlgo === ALGO_NAMES[0]) {
+      visitedGraphNodesInOrder = dijkstra(grid, startNode, targetNode);
+    } else if (selectedAlgo === ALGO_NAMES[1]) {
+      visitedGraphNodesInOrder = bfs_dfs(grid, startNode, targetNode);
+    }
     const [targetGraphNode] = visitedGraphNodesInOrder.slice(-1);
     if (targetGraphNode.props.nodeNum !== targetNode.props.nodeNum) {
       console.log("no path found");
@@ -259,21 +265,21 @@ export default class PathfindingVisualizer extends Component {
       const shortestPathGraphNodes = this.getNodesInShortestPathOrder(
         targetGraphNode
       );
-      ANIMATION_TIMEOUTS = this.animateDijsktra(
+      ANIMATION_TIMEOUTS = this.animateAlgo(
         visitedGraphNodesInOrder,
         shortestPathGraphNodes
       );
     }
   };
 
-  animateDijsktra = (visitedNodesInOrder, shortestPathGraphNodes) => {
+  animateAlgo = (visitedGraphNodesInOrder, shortestPathGraphNodes) => {
     const animationTimeouts = [];
     let t = 1;
     // animate graph nodes traversed by algo
-    for (let i = 0; i < visitedNodesInOrder.length; i++, t++) {
+    for (let i = 0; i < visitedGraphNodesInOrder.length; i++, t++) {
       animationTimeouts.push(
         setTimeout(() => {
-          const node = visitedNodesInOrder[i];
+          const node = visitedGraphNodesInOrder[i];
           const newGrid = this.state.grid;
           const newNode = React.cloneElement(node, { isGraphNode: true });
           newGrid[node.props.row][node.props.col] = newNode;
@@ -398,7 +404,7 @@ export default class PathfindingVisualizer extends Component {
           <KeyDownListener onKeyDown={this.handleOnKeyDown} />
           <div className="interface">
             <Interface
-              runDijkstraCallback={this.runDijkstra}
+              runAlgoCallback={this.runAlgo}
               resetGridCallback={this.resetGrid}
               setAlgoIdxCallback={this.setAlgoIdx}
               appBarColor={colorMode}
