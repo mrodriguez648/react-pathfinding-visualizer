@@ -18,7 +18,7 @@ const useStyles = makeStyles(
   { name: "SelectedMenu" }
 );
 
-export default function SimpleListMenu(props) {
+function SimpleListMenu(props) {
   const { setAlgoCallback, options, setPathfinderAlgoIdxCallback } = props;
   const classes = useStyles();
   const [anchorElement, setAnchorElement] = React.useState(null);
@@ -78,3 +78,5 @@ export default function SimpleListMenu(props) {
     </div>
   );
 }
+
+export default React.memo(SimpleListMenu);

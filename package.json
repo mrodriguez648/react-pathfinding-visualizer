@@ -19,9 +19,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "purge": "rm -rf ../mrodriguez.648.github.io/pathfinding-visualizer/static && cp -fR ./build/* ../mrodriguez648.github.io/pathfinding-visualizer",
+    "purge": "rm -rf ../mrodriguez648.github.io/pathfinding-visualizer/static && cp -fR ./build/* ../mrodriguez648.github.io/pathfinding-visualizer",
     "frontmatter": "echo '---\ntitle: Pathfinding Visualizer\nlayout: null\n---\n' | cat - ../mrodriguez648.github.io/pathfinding-visualizer/index.html > temp && mv temp ../mrodriguez648.github.io/pathfinding-visualizer/index.html",
-    "gitcommitmaster": "git -C ../mrodriguez648.github.io/ add -A && git -C ../mrodriguez648.github.io/ commit -m 'React app updated, see https://github.com/mrodriguez648/react-pathfinding-visualizer/commits/master' && git -C ../mrodriguez648.github.io/ push -u origin master",
+    "gitcommitmaster": "git -C ../mrodriguez648.github.io/ add -A && git -C ../mrodriguez648.github.io/ commit -m 'React app updated, see https://github.com/mrodriguez648/hayes-bolt-api-demo/commits/master' && git -C ../mrodriguez648.github.io/ push -u origin master",
     "deploy": "npm run purge && npm run frontmatter && npm run gitcommitmaster"
   },
   "eslintConfig": {

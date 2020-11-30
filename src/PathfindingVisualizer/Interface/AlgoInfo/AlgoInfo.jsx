@@ -12,7 +12,7 @@ const ALGO_INFO = [
   [
     "Breadth-first Search",
     "Konrad Zuse (1945)",
-    "Breadth-first search is an algorithm for traversing or searching tree or graph data structures. It starts at the tree root, and explores all of the neighbor nodes at the present depth prior to moving on to the nodes at the next depth level.",
+    "Breadth-first search is an algorithm for traversing or searching tree or graph data structures. It starts at the tree root, and explores all of the neighbor nodes at the present depth prior to moving on to the nodes at the next depth level. In this implementation, exploration of depths occurs in a clockwise rotation from top unexplored node to leftmost unexplored node.",
     "BFS and its application in finding connected components of graphs were invented in 1945 by Konrad Zuse, in his (rejected) Ph.D. thesis on the Plankalkül programming language (the first high-level programming language), but this was not published until 1972. It was reinvented in 1959 by Edward F. Moore, who used it to find the shortest path out of a maze,[4][5] and later developed by C. Y. Lee into a wire routing algorithm (published 1961)."
   ]
 ];
